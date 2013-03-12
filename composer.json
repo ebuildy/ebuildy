@@ -1,0 +1,23 @@
+{
+  "name": "ebuildy/ebuildy",
+  "type":"library",
+  "description": "PHP Framework",
+  "keywords": ["mvc","framework","php","annotations","ioc"],
+  "homepage": "http://github.com/ebuildy/ebuildy",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Thomas Decaux",
+      "email": "ebuildy@gmail.com",
+      "homepage": "http://ebuildy.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "autoload": {
+    "psr-0": {"ebuildy": "src/", "Twig_Node_Expression_" : "eBuildy/Templating/GetAttr.php"},
+    "classmap": ["./src/eBuildy/Templating/GetAttr.php"]
+  }
+}

@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <title><?= $title ?> - eBuildy Error</title>
+        <style>
+            * {
+                margin:0;
+                padding:0;
+                word-break: break-all;
+            }
+            
+            a 
+            {
+                color:#111;
+            }
+            
+            body {
+                background:#eee;
+                color:#333;
+                font:11px Verdana, Arial, sans-serif;
+            }
+            
+            .content {
+                margin:20px auto;
+                width: 1000px;
+            }
+            
+            .block {
+                background:#fff;
+                padding:30px;
+                border:1px solid #d1d1d2;
+                border-radius: 10px;
+                margin: 10px 0;
+            }
+            
+            .trace
+            {
+                margin:10px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="content">
+            <div class="block">
+                <h1><?= nl2br($title) ?></h1>
+                <h4><?= resolveFilePath($file) ?> [<?= $line ?>]</h4>
+            </div>
+            
+                        <div class="block">
+                <h2>Debug log</h2>
+                <table>
+                <?php foreach($debugLogs as $log): ?>
+                <tr><td><?= $log["name"] ?></td><td><?= json_encode($log["value"]) ?></td></tr>
+                <?php endforeach ?>
+                </table>
+            </div>
+            
+            <div class="block">
+                <?php foreach($trace as $item): ?>
+                <div class="trace">
+                    <?php
+                        $buffer = explode('/', $item['file']);
+                        $filename = $buffer[count($buffer) - 1];
+                    ?>
+                    <div><b><?= $filename ?></b>  [<?= $item['line'] ?>] <b><?= $item['function'] ?></b>(<?= trim(stripslashes(json_encode($item['args'])), '[]') ?>)</div>
+                    <?= resolveFilePath($item['file']) ?>
+                </div>
+                <?php endforeach ?>
+            </div>
+            <a href="//ebuildy.com">http://ebuildy.com</a>
+        </div>
+    </body>
+</html>
+<?php
+
+    function resolveFilePath($file)
+    {
+        return str_replace(realpath(ROOT), '', $file);
+    }
+
+?>

@@ -1,0 +1,252 @@
+<?php
+
+namespace eBuildy\Component;
+
+use eBuildy\Component\Cache;
+use eBuildy\Configuration\AnnotationLoader;
+use eBuildy\Helper\ResolverHelper;
+use Symfony\Component\Yaml\Yaml;
+
+class Configuration
+{
+    private $configuration = array();
+
+    public function addNode($name, $data)
+    {
+        if ($name === 'root')
+        {
+            $this->configuration = array_merge($data, $this->configuration);
+        }
+        else
+        {
+            if ($name === 'parameters')
+            {
+                if (!isset($this->configuration[$name]))
+                {
+                    $this->configuration[$name] = array();
+                }
+
+                foreach ($data as $k => $v)
+                {
+                    $this->__addNode($this->configuration[$name], $k, $v);
+                }
+            }
+            else
+            {
+                $this->__addNode($this->configuration, $name, $data);
+            }
+        }
+    }
+
+    private function __addNode(&$node, $name, $data)
+    {
+        if (!isset($node[$name]))
+        {
+            $node[$name] = array();
+        }
+
+        if ($data !== null && is_array($data))
+        {
+            $node[$name] = array_merge_recursive($node[$name], $data);
+        }
+    }
+
+    public function getAll()
+    {
+        return $this->configuration;
+    }
+
+    public function getNode($name, $default = null)
+    {
+        return isset($this->configuration[$name]) ? $this->configuration[$name] : $default;
+    }
+
+    public function get($name, $default = null)
+    {
+        return $this->getNode($name, $default);
+    }
+
+    public function loadAnnotations($path)
+    {
+        $loader = new AnnotationLoader();
+
+        foreach ($loader->load($path) as $k => $v)
+        {
+            $this->addNode($k, $v);
+        }
+    }
+
+    public function loadFile($source, $parameters = array())
+    {
+        if (!is_readable($source))
+        {
+            throw new \Exception('Configuration source "' . $source . '" is not readable!');
+        }
+
+        $cacheDest = 'config/' . md5($source) . '/' . md5(json_encode($parameters));
+
+        if (Cache::needFresh($source, $cacheDest) || DEBUG)
+        {
+            $content = file_get_contents($source);
+
+            foreach ($parameters as $k => $v)
+            {
+                $parameters['&' . $k] = $v;
+
+                $content = str_replace('%' . $k . '%', '*' . $k, $content);
+
+                unset($parameters[$k]);
+            }
+
+            $aliasYaml = Yaml::dump(array('__aliases' => $parameters), 3);
+
+            foreach ($parameters as $k => $v)
+            {
+                $aliasYaml = str_replace('\'' . $k . '\':', '- ' . $k, $aliasYaml);
+            }
+
+            //die($aliasYaml.PHP_EOL.$content);
+
+            $result = Yaml::parse($aliasYaml . PHP_EOL . $content);
+
+            unset($result['__aliases']);
+
+            Cache::set($cacheDest, $result);
+        }
+        else
+        {
+            $result = Cache::get($cacheDest);
+        }
+
+        foreach ($result as $k => $v)
+        {
+            $this->addNode($k, $v);
+        }
+    }
+
+    public function buildContainer($filePath)
+    {
+        $phpContent = '<?php ' . PHP_EOL . PHP_EOL . 'class Container {' . PHP_EOL . PHP_EOL;
+        
+        $phpContent .= 'public $commands = ' . var_export($this->configuration['commands'], true) . ';' . PHP_EOL;        
+        
+        $phpContent .= 'public $eventListeners = ' . var_export($this->configuration['event_listeners'], true) . ';' . PHP_EOL;        
+        
+        $frameworkDebug = $this->configuration['parameters']['ebuildy']['debug'];
+        
+        $services   = $this->get('services');
+
+        foreach ($services as $serviceName => $service)
+        {
+            $phpContent .= 'protected $' . $this->resolveServicePropertyName($serviceName) . ' = null;' . PHP_EOL;
+        }
+
+        $phpContent .= PHP_EOL . PHP_EOL;
+
+        foreach ($this->get('parameters') as $parameterName => $parameter)
+        {
+            $method = $this->resolveParameterMethod($parameterName);
+
+            $phpContent .= 'public function ' . $method . '() {' . PHP_EOL;
+
+            $parameter['debug'] = $frameworkDebug;
+
+            $phpContent .= "\t" . 'return ' . var_export($parameter, true) . ';' . PHP_EOL;
+
+            $phpContent .= '}' . PHP_EOL . PHP_EOL;
+        }
+
+        foreach ($services as $serviceName => $service)
+        {
+            $method = ResolverHelper::resolveServiceMethodName($serviceName);
+            
+            if (!isset($service['class']))
+            {
+                var_dump($serviceName, $service);
+                die('error configuration.php');
+            }
+            
+            $phpContent .= '/**' . PHP_EOL . '* @public' . PHP_EOL . '* @return ' . $service['class'] . PHP_EOL . '*/' . PHP_EOL;
+
+            $phpContent .= 'public function ' . $method . '() {' . PHP_EOL;
+
+            $phpContent .= "\t" . 'if ($this->' . $this->resolveServicePropertyName($serviceName) . ' === null) {' . PHP_EOL;
+
+            $phpContent .= "\t\t" . '$this->' . $this->resolveServicePropertyName($serviceName) . ' = new ' . $service['class'] . '();' . PHP_EOL;
+
+            $phpContent .= "\t\t" . '$this->' . $this->resolveServicePropertyName($serviceName) . '->container = $this;' . PHP_EOL;
+
+            if (isset($service['configurationNode']))
+            {
+                $phpContent .= "\t\t" . '$this->' . $this->resolveServicePropertyName($serviceName) . '->initialize($this->' . $this->resolveParameterMethod($service['configurationNode']) . '());' . PHP_EOL;
+            }
+
+            if (isset($service['dependencies']))
+            {
+                foreach ($service['dependencies'] as $property => $serviceToInject)
+                {
+                    $phpContent .= "\t\t" . '$this->' . $this->resolveServicePropertyName($serviceName) . '->' . $property . ' = $this->' . \eBuildy\Helper\ResolverHelper::resolveServiceMethodName($serviceToInject) . '();' . PHP_EOL;
+                }
+            }
+
+            $phpContent .= "\t" . '}' . PHP_EOL;
+
+            $phpContent .= "\t" . 'return $this->' . $this->resolveServicePropertyName($serviceName) . ';' . PHP_EOL;
+
+            $phpContent .= '}' . PHP_EOL . PHP_EOL;
+        }
+
+        $phpContent .= 'public function get($service) {' . PHP_EOL;
+
+        $phpContent .= "\t" . '$method = \eBuildy\Helper\ResolverHelper::resolveServiceMethodName($service);' . PHP_EOL;
+
+        $phpContent .= "\t" . 'return $this->$method(); ' . PHP_EOL;
+
+        $phpContent .= '}' . PHP_EOL;
+
+        $phpContent.= '}';
+        //         die($phpContent);
+        file_put_contents($filePath, $phpContent);
+    }
+
+    protected function resolveServicePropertyName($service)
+    {
+        if (strpos($service, '.') === false)
+        {
+            return '__' . $service . 'Service';
+        }
+        else
+        {
+            $name   = '';
+            $buffer = explode('.', $service);
+
+            foreach ($buffer as $item)
+            {
+                $name .= ucfirst($item);
+            }
+
+            return '__' . lcfirst($name);
+        }
+    }
+
+    protected function resolveParameterMethod($value)
+    {
+        if (strpos($value, '.') === false)
+        {
+            return 'get' . ucfirst($value) . 'Configuration';
+        }
+        else
+        {
+            $name   = '';
+            $buffer = explode('.', $value);
+
+            foreach ($buffer as $item)
+            {
+                $name .= ucfirst($item);
+            }
+
+            return 'get' . $name . 'Configuration';
+        }
+    }
+
+}
