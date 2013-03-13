@@ -25,5 +25,13 @@ abstract class Command
         return $argv[$index + 1];
     }
     
-    abstract public function run();
+    public function autoCompletion()
+    {
+        return array('nop', 'nop');
+    }
+    
+    public function execute($input, $output)
+    {
+        
+    }
 }

@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+    //die(implode("\n", $argv));
+
+    if ($argc == 1)
+    {
+        die("Use: ./console ENV NAMESPACE:COMMAND" . PHP_EOL);
+    }
+    else
+    {
+        $cmd = $argv[1];
+
+        if ($cmd === '__autocomplete__')
+        {
+            if ($argc <= 2)
+            {
+                die(implode(PHP_EOL, array("dev", "prod")) . PHP_EOL);
+            }
+            else
+            {
+                $_SERVER['ENV'] = $argv[2];
+            }
+
+            include("./web/index.php");
+        }
+    }

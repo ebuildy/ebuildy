@@ -1,0 +1,33 @@
+#!bash
+
+_console()
+{
+    local cur prev opts cmd php
+
+    cmd="${COMP_WORDS[0]}"
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    
+    if [[ ${COMP_CWORD} = 1 ]] ; then
+            opts=$(${cmd} __autocomplete__)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+    fi
+
+    if [[ ${COMP_CWORD} = 2 ]] ; then
+            opts=$(${cmd} __autocomplete__ ${COMP_WORDS[1]})
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+    fi
+
+    if [[ ${COMP_CWORD} = 3 ]] ; then
+            opts=$(${cmd} __autocomplete__ ${COMP_WORDS[1]} ${COMP_WORDS[2]})
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+    fi
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+
+    return 0
+}
+
+complete -F _console console
