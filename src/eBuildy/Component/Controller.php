@@ -23,16 +23,7 @@ class Controller extends ContainerAware
         {
             $method = $route['function'];
             
-            $res = $this->$method($request);
-
-            if (gettype($res) === 'object')
-            {
-                $response = $res;
-            }
-            else
-            {
-                $response = new Response($res);
-            }
+            $response = $this->$method($request);
         }
         else
         {
