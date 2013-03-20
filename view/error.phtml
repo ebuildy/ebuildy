@@ -36,13 +36,37 @@
             {
                 margin:10px 0;
             }
+            
+            ol
+            {
+                border: 1px solid #D1D1D2;
+                margin: 10px;
+                list-style-type: decimal;
+            }
+            
+            ol li
+            {
+                padding: 3px;
+            }
+            
+            ol li:nth-child(odd)
+            {
+                background:#F0F0F0;
+            }
+            
+            .good_line
+            {
+                background:rgb(255, 170, 77);
+            }
         </style>
     </head>
     <body>
         <div class="content">
             <div class="block">
                 <h1><?= nl2br($title) ?></h1>
+                <h2><?= 2 ?></h2>
                 <h4><?= resolveFilePath($file) ?> [<?= $line ?>]</h4>
+                <?= readSourcePortion($file, $line) ?>
             </div>
             
                         <div class="block">
@@ -58,10 +82,16 @@
                 <?php foreach($trace as $item): ?>
                 <div class="trace">
                     <?php
+                        $file = $item['file'];
+                        $line = $item['line'];
+                    
                         $buffer = explode('/', $item['file']);
                         $filename = $buffer[count($buffer) - 1];
                     ?>
-                    <div><b><?= $filename ?></b>  [<?= $item['line'] ?>] <b><?= $item['function'] ?></b>(<?= trim(stripslashes(json_encode($item['args'])), '[]') ?>)</div>
+                    <div>
+                        <h2><?= $item['caller'] ?>(<?= join(', ', $item['args']) ?>)</h2>
+                        <b><?= $filename ?></b>  [<?= $item['line'] ?>]</div>
+                    <?= readSourcePortion($file, $line) ?>
                     <?= resolveFilePath($item['file']) ?>
                 </div>
                 <?php endforeach ?>
@@ -76,5 +106,21 @@
     {
         return str_replace(realpath(ROOT), '', $file);
     }
-
+    
+    function readSourcePortion($file, $line)
+    {
+        $buffer = "";
+        
+        $line--;
+        
+        $lines = file($file, FILE_IGNORE_NEW_LINES);
+        
+        for($i = max(array(0, $line - 5)); $i < min(count($lines), $line + 5); $i++)
+        {
+            $buffer .= '<li '. ($i == $line ? 'class="good_line"' : '') .'>' . str_replace(array('&lt;?php'), '', highlight_string('<?php ' . $lines[$i], true)) . "</li>" . PHP_EOL;
+        }
+        
+        return '<ol start="' . (max(array(0, $line - 4))) . '">' . $buffer . '</ol>';
+    }
+    
 ?>

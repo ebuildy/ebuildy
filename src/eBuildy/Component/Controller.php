@@ -3,30 +3,21 @@
 namespace eBuildy\Component;
 
 use eBuildy\Component\Response;
+use eBuildy\Container\ContainerAware;
 
-class Controller
+class Controller extends ContainerAware
 {
     use ApplicationAware;
     
     protected $request;
-    
-    /**
-     * The main container
-     * 
-     * @var \Container
-     */
-    protected $container;
-    
-    public function __construct()
-    {
-        $this->container = $this->getApplication()->container;
-    }
-    
+        
     public function execute($request)
     {
         $this->request  = $request;
         
         $route = $request->route;
+        
+        $this->preExecute($request);
         
         if (isset($route['function']))
         {
@@ -36,13 +27,31 @@ class Controller
 
             if (gettype($res) === 'object')
             {
-                return $res;
+                $response = $res;
             }
             else
             {
-                return new Response($res);
+                $response = new Response($res);
             }
         }
+        else
+        {
+            $response = null;
+        }
+        
+        $this->postExecute($request, $response);
+        
+        return $response;
+    }
+    
+    protected function preExecute($request)
+    {
+        
+    }
+    
+    protected function postExecute($request, $response)
+    {
+        
     }
     
      /**

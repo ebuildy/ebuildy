@@ -42,9 +42,11 @@ class CommandWorker extends BaseWorker
 
     public function run()
     {
+        global $argv;
+        
         $parameters = $this->parameters;
         $parametersCount = count($parameters);
-        
+      
         $input = $this->input = new \Symfony\Component\Console\Input\ArgvInput($parameters);
         $output = $this->output = new \Symfony\Component\Console\Output\ConsoleOutput();
         
@@ -54,7 +56,7 @@ class CommandWorker extends BaseWorker
         }
         
         set_time_limit(0);
-        
+
         if ($input->getFirstArgument() === '__autocomplete__')
         {
             return $this->runAutoCompletion();
@@ -82,10 +84,8 @@ class CommandWorker extends BaseWorker
         $command = $this->commands[$commandInput];
 
         $commandInstance = new $command($commandInput);
-        
-        array_pop($argv);
-        
-        $commandInstance->run(new \Symfony\Component\Console\Input\ArgvInput($argv), $output);
+                
+        return $commandInstance->run(new \Symfony\Component\Console\Input\ArgvInput($argv), $output);
     }
     
     public function onException(\Exception $e)

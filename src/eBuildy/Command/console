@@ -23,4 +23,12 @@
 
             include("./web/index.php");
         }
+        else
+        {
+            $_SERVER['ENV'] = $cmd;
+            
+            array_shift($argv);
+            
+            include("./web/index.php");
+        }
     }
