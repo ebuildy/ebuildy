@@ -104,7 +104,31 @@ class AssetHelper
         $targetUri             = ($type === 'js' ? $this->jsPath : $this->cssPath) . AssetResolver::resolveNameWithVersion($targetFileName, $type, $this->version, $this->versionFormat);
         $targetFilePath     = WEB_PATH . AssetResolver::resolveNameForCompilation($targetUri);
                 
-        if ($force || ($this->enableCompilation && ($this->forceCompilation || !file_exists($targetFilePath))))
+        if ($force || $this->forceCompilation)
+        {
+            $doCompilation = true;
+        }
+        elseif ($this->enableCompilation)
+        {
+            if (!file_exists($targetFilePath))
+            {
+                $doCompilation = true;
+            }
+            elseif (filemtime($source) > filemtime($targetFilePath))
+            {
+                $doCompilation = true;
+            }
+            else
+            {
+                $doCompilation = false;
+            }
+        }
+        else
+        {
+            $doCompilation = false;
+        }
+                
+        if ($doCompilation)
         {
             if ($type === 'js')
             {
