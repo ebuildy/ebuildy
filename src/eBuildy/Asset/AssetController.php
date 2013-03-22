@@ -7,7 +7,7 @@ use eBuildy\Component\Response;
 
 class AssetController extends Controller
 {
-    public function compileCSS($request)
+    public function compileCSS($request, $response)
     {
         $buffer = $this->resolveData($request->get('data'));
         
@@ -18,7 +18,7 @@ class AssetController extends Controller
         ));
     }
     
-    public function compileJS($request)
+    public function compileJS($request, $response)
     {
         $buffer = $this->resolveData($request->get('data'));
         

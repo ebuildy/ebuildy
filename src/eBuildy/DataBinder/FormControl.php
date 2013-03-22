@@ -13,6 +13,11 @@ class FormControl extends DataBinder
     public function __construct($name, $label, $options = array())
     {
         parent::__construct($name);
+        
+        if (isset($options['template']))
+        {
+            $this->template = $options['template'];
+        }
                 
         if (isset($options['required']) && $options['required'] === true)
         {
@@ -26,6 +31,18 @@ class FormControl extends DataBinder
         
         $this->label = $label;
         $this->options = $options;
+    }
+    
+    public function getOptions($field = null, $default = null)
+    {
+        if ($field === null)
+        {
+            return $this->options;
+        }
+        else
+        {
+            return isset($this->options[$field]) ? $this->options[$field] : $default;
+        }
     }
     
     public function getRowTemplate()

@@ -7,35 +7,45 @@ use eBuildy\Container\ContainerAware;
 
 class Controller extends ContainerAware
 {
-    use ApplicationAware;
-    
     protected $request;
-        
-    public function execute($request)
-    {
-        $this->request  = $request;
+    protected $response;
+    
+    use ApplicationAware;
+            
+    public function execute($request, $response)
+    {        
+        $this->request = $request;
+        $this->response = $response;               
         
         $route = $request->route;
         
-        $this->preExecute($request);
+        $this->preExecute($request, $response);
         
         if (isset($route['function']))
         {
             $method = $route['function'];
             
-            $response = $this->$method($request);
+            $res = $this->$method($request, $response);
+            
+            if ($res !== null)
+            {
+                if (gettype($res) === 'string')
+                {
+                    $response->setContent($res);
+                }
+            }
         }
         else
         {
-            $response = null;
+            $res = null;
         }
         
         $this->postExecute($request, $response);
         
-        return $response;
+        return $res;
     }
     
-    protected function preExecute($request)
+    protected function preExecute($request, $response)
     {
         
     }
@@ -66,14 +76,9 @@ class Controller extends ContainerAware
      *
      * @return RedirectResponse
      */
-    public function redirectWithHtml($url, $response = null)
-    {
-        if ($response === null)
-        {
-            $response = new Response();
-        }
-        
-        $response->setContent(
+    public function redirectWithHtml($url)
+    {        
+        $this->response->setContent(
             sprintf('<!DOCTYPE html>
 <html>
     <head>
@@ -87,7 +92,7 @@ class Controller extends ContainerAware
     </body>
 </html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8')));
         
-        return $response;
+        return $this->response->render();
     }
         
    /**
@@ -98,48 +103,32 @@ class Controller extends ContainerAware
      *
      * @return RedirectResponse
      */
-    public function redirect($url, $status = 302, $response = null)
+    public function redirect($url, $status = 302)
     {
-        if ($response === null)
-        {
-            $response = new Response();
-        }
+        $this->redirectWithHtml($url);
         
-        $response = $this->redirectWithHtml($url, $response);
+        $this->response->addHeader('location', $url);
         
-        $response->addHeader('location', $url);
-        
-        return $response;
+        return $this->response->render();
     }
     
-    protected function  renderJSON($data, $response = null)
+    protected function  renderJSON($data)
     {
-        if ($response === null)
-        {
-            $response = new Response();
-        }
+        $this->response->setContent(json_encode($data));
         
-        $response->setContent(json_encode($data));
-        
-        return $response;
+        return $this->response;
     }
 
-
-    protected function renderDecoratedTemplate($templates, $data = array(), $response = null)
+    protected function renderDecoratedTemplate($templates, $data = array())
     {
-        if ($response === null)
-        {
-            $response = new Response();
-        }
-        
         foreach($templates as &$template)
         {
             $template = \eBuildy\Helper\ResolverHelper::resolveTemplatePath($template, $this->request->route['module'], $this->request->route['controller']);
         }
         
-        $response->setContent($this->get('templating')->renderDecoratedTemplate($templates, $data));
-                
-        return $response;
+        $this->response->setContent($this->get('templating')->renderDecoratedTemplate($templates, $data));
+        
+        return $this->response;
     }
         
     

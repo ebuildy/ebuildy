@@ -67,10 +67,10 @@ class Compiler
         }
     }
 
-    public function __get($name)
-    {
-        return $this->container->get(str_replace('_', '.', $name));
-    }
+//    public function __get($name)
+//    {
+//        return $this->container->get(str_replace('_', '.', $name));
+//    }
     
     public function getContext()
     {

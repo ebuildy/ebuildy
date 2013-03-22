@@ -4,9 +4,6 @@ namespace eBuildy\Component;
 
 use eBuildy\Helper\ParameterBag;
 
-/**
- * @Service('request')
- */
 class Request implements \ArrayAccess
 {
     protected static $trustProxy = false;

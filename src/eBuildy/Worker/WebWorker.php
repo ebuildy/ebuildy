@@ -6,7 +6,8 @@ class WebWorker extends BaseWorker
 {
     public function initialize($inputGet, $inputPost, $inputCookie, $inputFile, $inputServer)
     {
-        $this->input = $this->container->getRequestService();
+        $this->input = new \eBuildy\Component\Request();
+        $this->output = new \eBuildy\Component\Response();
         
         $this->input->initialize($inputGet, $inputPost, array(), $inputCookie, $inputFile, $inputServer);
     }
@@ -23,17 +24,17 @@ class WebWorker extends BaseWorker
         
         $controller= new $controllerClass($this->container);
 
-        $this->output = $controller->execute($this->input);
+        $controller->execute($this->input, $this->output);
 
         return $this->output->render();
     }
     
     public function onException(\Exception $e)
     {  
-        $this->onError($e->getCode(), 'Uncaught exception: ' . $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTrace());
+        $this->onError($e->getCode(), 'Uncaught exception: ' . $e->getMessage(), $e->getFile(), $e->getLine(), null, $e->getTrace());
     }
 
-    public function onError($errno, $errstr, $errfile, $errline, $trace = null)
+    public function onError($errno, $errstr, $errfile, $errline, $context, $trace = null)
     {
         if (ob_get_level() > 0)
         {
@@ -49,11 +50,19 @@ class WebWorker extends BaseWorker
         
         array_shift($__trace);
         
+        $__trace = array_values($__trace);        
+      //  var_dump($__trace);die();
         for($i = 2; $i < count($__trace); $i++)
         {
             $current = $__trace[$i];
+            $previous = $__trace[$i - 1];
             
-            $item = array('file' => $__trace[$i - 1]['file'], 'line' => $__trace[$i - 1]['line'], 'function' => $__trace[$i]['function'], 'args' => $__trace[$i]['args']);
+            if (!isset($previous['file']))
+            {
+                continue ;
+            }
+            
+            $item = array('file' => $previous['file'], 'line' => $previous['line'], 'function' => $current['function'], 'args' => $current['args']);
             
             if (isset($current['type']))
             {
@@ -62,6 +71,10 @@ class WebWorker extends BaseWorker
             elseif (isset($current['function']))
             {
                 $item['caller'] = $current['function'];
+            }
+            else
+            {
+                $item['caller'] = '';
             }
             
             if (isset($current['args']))
@@ -77,6 +90,10 @@ class WebWorker extends BaseWorker
                     {
                         $buffer []= (string) get_class($arg);
                     }
+                    elseif ($type === 'array')
+                    {
+                        $buffer []= $type;
+                    }
                     else
                     {
                         $buffer []= var_export($arg, true);// $type;
@@ -87,7 +104,7 @@ class WebWorker extends BaseWorker
             }
             else
             {
-                $item['args'] = '';
+                $item['args'] = array();
             }
             
             $trace []= $item;
