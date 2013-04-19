@@ -18,4 +18,9 @@ class ContainerAware
     {
         $this->container = $container;
     }
+    
+    protected function get($key)
+    {
+        return $this->container->get($key);
+    }
 }

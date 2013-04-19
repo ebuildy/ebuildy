@@ -34,8 +34,6 @@ abstract class Application
         self::$instance = $this;
 
         $this->env   = $env;
-                
-        $this->eventDispatcher = new EventDispatcher();
     }
 
     public function run()
@@ -84,6 +82,8 @@ abstract class Application
     
     protected function initializeEventDispatcher()
     {
+        $this->eventDispatcher = new EventDispatcher($this->container);
+        
         $listeners = $this->container->eventListeners;
         
         if ($listeners !== null)

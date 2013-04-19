@@ -47,9 +47,23 @@ class Cache
     {
         $folder = dirname($target);
         
+        if (!is_dir(TMP_PATH))
+        {
+            mkdir(TMP_PATH, 0777, true);
+        }
+        
         if (!is_dir(TMP_PATH . $folder))
         {
-            mkdir(TMP_PATH . $folder, 0777, true);
+            if (!is_writable(TMP_PATH))
+            {
+                throw new \Exception(TMP_PATH . ' is not writable !');
+            }
+            else
+            {            
+                mkdir(TMP_PATH . $folder, 0777, true);
+            
+                chmod(TMP_PATH . $folder, 0777);
+            }
         }
         
         if (is_writable(TMP_PATH . $folder) === false)
@@ -58,7 +72,9 @@ class Cache
         }
         else
         {
-            return file_put_contents(TMP_PATH . $target, $content);
+            file_put_contents(TMP_PATH . $target, $content);
+            
+            chmod(TMP_PATH . $target, 0644);
         }
     }
 }

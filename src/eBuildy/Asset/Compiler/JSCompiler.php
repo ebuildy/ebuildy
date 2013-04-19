@@ -20,6 +20,7 @@ class JSCompiler extends AssetCompiler
             }
             
             file_put_contents($target, $this->content);
+            chmod($target, 0644);
         }
         
         return $this->content;

@@ -21,7 +21,7 @@ abstract class BaseWorker
      protected function initializeErrorHandling()
     {
         set_error_handler(array($this, 'onError'));
-        
+
         set_exception_handler(array($this, 'onException'));
     }
     

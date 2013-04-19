@@ -69,19 +69,7 @@ class FormControl extends DataBinder
     {
         if (isset($this->options['validators']))
         {
-            $validators = $this->options['validators'];
-
-            foreach($validators as $validator)
-            {
-                $res = $validator->validate($this->getData());
-                
-                if ($res !== true)
-                {
-                    $this->errors[] = $res;
-                    
-                    break;
-                }
-            }
+            $this->validate($this->options['validators']);
         }
         
         if ($this->isValid())

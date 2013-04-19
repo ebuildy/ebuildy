@@ -58,7 +58,7 @@ class Form extends DataBinder
             {
                 foreach($child->getErrors() as $errorName => $error)
                 {
-                    $this->errors[$child->name.'.'.$errorName] = $error;
+                    $this->errors[$child->name] = $error;
                 }
             }
         }

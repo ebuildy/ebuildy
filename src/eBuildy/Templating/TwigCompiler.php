@@ -8,7 +8,7 @@ class TwigCompiler extends Compiler
     {        
         $target = 'templates/' . basename($this->templatePath).'.php';
         
-        $env = new \Twig_Environment(new \Twig_Loader_Filesystem(SOURCE_PATH), array('autoescape' => false, 'cache' => false, 'base_template_class' => 'eBuildy\Templating\TwigBaseTemplate'));
+        $env = new \Twig_Environment(new \Twig_Loader_Filesystem(SOURCE_PATH), array('autoescape' => false, 'cache' => true, 'debug' => true, 'base_template_class' => 'eBuildy\Templating\TwigBaseTemplate'));
         
         $env->addGlobal('__template_name', basename($this->templatePath));
                 

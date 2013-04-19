@@ -104,7 +104,45 @@ abstract class DataBinder
      */
     public function getError($key)
     {
-        return isset($this->errors[$key]) ? $this->errors[$key] : null;
+        if (is_numeric($key))
+        {
+            $buffer = array_values($this->errors);
+            
+            return $buffer[$key];
+        }
+        else
+        {
+            return isset($this->errors[$key]) ? $this->errors[$key] : null;
+        }
+    }
+    
+    /**
+     * Validate data.
+     * 
+     * @param array $validators
+     * 
+     * @return boolean
+     */
+    public function validate($validators)
+    {
+        if (!is_array($validators))
+        {
+            $validators = array($validators);
+        }
+        
+        foreach($validators as $validator)
+        {
+            $res = $validator->validate($this->getData());
+
+            if ($res !== true)
+            {
+                $this->errors[] = $res;
+
+                return false;
+            }
+        }
+        
+        return true;
     }
     
     /**

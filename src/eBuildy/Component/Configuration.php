@@ -126,7 +126,7 @@ class Configuration
 
     public function buildContainer($filePath)
     {
-        $phpContent = '<?php ' . PHP_EOL . PHP_EOL . 'class Container {' . PHP_EOL . PHP_EOL;
+        $phpContent = '<?php ' . PHP_EOL . PHP_EOL . 'class Container extends \eBuildy\Container\BaseContainer {' . PHP_EOL . PHP_EOL;
         
         $phpContent .= 'public $commands = ' . var_export($this->configuration['commands'], true) . ';' . PHP_EOL;        
         
@@ -196,17 +196,10 @@ class Configuration
             $phpContent .= '}' . PHP_EOL . PHP_EOL;
         }
 
-        $phpContent .= 'public function get($service) {' . PHP_EOL;
-
-        $phpContent .= "\t" . '$method = \eBuildy\Helper\ResolverHelper::resolveServiceMethodName($service);' . PHP_EOL;
-
-        $phpContent .= "\t" . 'return $this->$method(); ' . PHP_EOL;
-
-        $phpContent .= '}' . PHP_EOL;
-
         $phpContent.= '}';
         //         die($phpContent);
         file_put_contents($filePath, $phpContent);
+        chmod($filePath, 0644);
     }
 
     protected function resolveServicePropertyName($service)

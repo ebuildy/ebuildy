@@ -50,9 +50,9 @@ class WebWorker extends BaseWorker
         
         array_shift($__trace);
         
-        $__trace = array_values($__trace);        
+        $__trace = array_values($__trace);    
       //  var_dump($__trace);die();
-        for($i = 2; $i < count($__trace); $i++)
+        for($i = 1; $i < count($__trace); $i++)
         {
             $current = $__trace[$i];
             $previous = $__trace[$i - 1];

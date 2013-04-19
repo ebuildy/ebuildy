@@ -77,7 +77,7 @@ class AssetResolver
     }
     
     static public  function resolveNameForCompilation($name)
-    {
+    {        
         $a = strpos($name, '?');
         
         if ($a !== false)

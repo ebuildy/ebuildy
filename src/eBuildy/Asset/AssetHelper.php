@@ -47,8 +47,8 @@ class AssetHelper
 
     public function initialize($configuration)
     {
-        $this->cssPath = $configuration['path'] . 'css/';
-        $this->jsPath  = $configuration['path'] . 'js/';
+        $this->cssPath = $configuration['uri'] . 'css/';
+        $this->jsPath  = $configuration['uri'] . 'js/';
         $this->version = isset($configuration['version']) ? $configuration['version'] : null;
         $this->versionFormat = isset($configuration['version_format']) ? $configuration['version_format'] : '{name}.{extension}?v={version}';
         

@@ -30,8 +30,63 @@ class AssetDumper
         {
             $this->parseFile($file);
         }
+        
+        $Iterator  = new \RecursiveIteratorIterator($iterator = new \RecursiveDirectoryIterator($this->path));
+        $Regex    = new \RegexIterator($Iterator, '/^.+\.twig/i', \RecursiveRegexIterator::GET_MATCH);
+
+        foreach ($Regex as $file => $vv)
+        {
+            $this->parseTwigFile($file);
+        }
                         
         return $this->assets;
+    }
+    
+    protected function parseTwigFile($file)
+    {
+        $env = new \Twig_Environment(new \Twig_Loader_Filesystem(SOURCE_PATH), array('autoescape' => false, 'cache' => false, 'base_template_class' => 'eBuildy\Templating\TwigBaseTemplate'));
+                
+        $lexer = new \Twig_Lexer($env);
+        
+        $parser = new \Twig_Parser($env);
+        
+        $stream = $lexer->tokenize(file_get_contents($file), $file);
+        
+        while(!$stream->isEOF())
+        {
+            $node = $stream->next();
+            
+            $method = $node->getValue();
+ 
+            if ($method === 'getCss')
+            {
+                $type = 'css';
+            }
+            elseif ($method === 'getJs')
+            {
+                $type = 'js';
+            }
+            else
+            {
+                $type = null;
+            }
+
+            if ($type !== null)
+            {
+                $arg = $this->getTwigArgument($stream);
+
+                $sourcePath = AssetResolver::resolveSourcePath($arg, \eBuildy\Helper\ResolverHelper::getModulePathFromView($file));
+
+                if ($sourcePath === null)
+                {
+                    // var_dump(array('file' => $file, 'type' => $type, 'source' => $arg));
+                }
+                else
+                {
+                    $this->assets[$sourcePath] = $type;
+                }
+            }                    
+        }
     }
     
     protected function parseFile($file)
@@ -79,6 +134,35 @@ class AssetDumper
                 }
             }
         }
+    }
+    
+    protected function getTwigArgument(\Twig_TokenStream $stream)
+    {
+        $buffer = "";
+        
+        // 1. Move to open bracket
+        while(!$stream->isEOF())
+        {
+            if ($stream->next()->getValue() === '(')
+            {
+                break;
+            }
+        }
+                            
+        // 2. Fetch until close bracket
+        while(!$stream->isEOF())
+        {
+            $token = $stream->next()->getValue();
+            
+            if ($token === ')' || $token === ',')
+            {
+                break;
+            }
+            
+            $buffer .= $token;
+        }
+    
+        return $buffer;
     }
     
     protected function getArgument($tokens, &$index)

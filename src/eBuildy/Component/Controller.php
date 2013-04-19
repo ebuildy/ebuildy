@@ -2,16 +2,13 @@
 
 namespace eBuildy\Component;
 
-use eBuildy\Component\Response;
 use eBuildy\Container\ContainerAware;
 
 class Controller extends ContainerAware
 {
     protected $request;
     protected $response;
-    
-    use ApplicationAware;
-            
+                
     public function execute($request, $response)
     {        
         $this->request = $request;

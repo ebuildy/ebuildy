@@ -13,7 +13,7 @@ class Response
         $this->rawContent = $content;
         $this->headers = $headers;
     }
-    
+      
     public function addHeader($name, $value)
     {
         $this->headers[$name] = $value;

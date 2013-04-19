@@ -7,7 +7,7 @@ namespace eBuildy\Asset;
  */
 class AssetCommand extends \eBuildy\Component\Command
 {
-    public function run()
+   public function run()
    {
         $dumper = new AssetDumper(SOURCE_PATH);
         

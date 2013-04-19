@@ -12,6 +12,6 @@ class Twig_Node_Expression_GetAttr extends Twig_Node_Expression
     {
         $compiler->subcompile($this->getNode('node'));
 
-        $compiler->raw('[')->subcompile($this->getNode('attribute'))->raw(']');
+        $compiler->raw('[')->subcompile(trim($this->getNode('attribute')))->raw(']');
     }
 }

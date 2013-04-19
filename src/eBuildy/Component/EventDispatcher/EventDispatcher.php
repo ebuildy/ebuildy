@@ -2,13 +2,11 @@
 
 namespace eBuildy\Component\EventDispatcher;
 
-use eBuildy\Component\ApplicationAware;
+use eBuildy\Container\ContainerAware;
 use eBuildy\Component\EventDispatcher\Event;
 
-class EventDispatcher
-{
-    use ApplicationAware;
-    
+class EventDispatcher extends ContainerAware
+{    
     private $listeners = array();
     
      public function dispatch($event, $data = null)
@@ -27,7 +25,7 @@ class EventDispatcher
 
         foreach ($eventListeners as $listener) 
         {
-            $serviceInstance = $this->get($listener['listener']['service']);
+            $serviceInstance = $this->container->get($listener['listener']['service']);
             
             call_user_func(array($serviceInstance, $listener['listener']['method']), $event);
             
