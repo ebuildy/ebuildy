@@ -8,21 +8,7 @@ class TwigCompiler extends Compiler
     {        
         $target = 'templates/' . basename($this->templatePath).'.php';
         
-        $env = new \Twig_Environment(new \Twig_Loader_Filesystem(SOURCE_PATH), array('autoescape' => false, 'cache' => true, 'debug' => true, 'base_template_class' => 'eBuildy\Templating\TwigBaseTemplate'));
-        
-        $env->addGlobal('__template_name', basename($this->templatePath));
-                
-        foreach($this->exposedMethod as $methodName => $method)
-        {
-            if (isset($method['service']))
-            {
-                $env->addFunction($methodName, new \Twig_SimpleFunction($methodName, '$this->container->' . \eBuildy\Helper\ResolverHelper::resolveServiceMethodName($method['service']) . '()->' . $method['method']));
-            }
-            else
-            {
-                $env->addFunction($methodName, new \Twig_SimpleFunction($methodName, '$this->' . $methodName));
-            }
-        }
+        $template = $this->_compile();
 //        
 //        $lexer = new \Twig_Lexer($env);
 //        
@@ -44,11 +30,34 @@ class TwigCompiler extends Compiler
 //        
 //        include($this->templatePath);
         
-        $template = $env->loadTemplate(str_replace(SOURCE_PATH, '', $this->templatePath));
+        
         
         $template->setBlocks($this->blocks);
         $template->container = $this->container;
 
         return $template->render($this->data);
+    }
+    
+    protected function _compile()
+    {
+        $env = new \Twig_Environment(new \Twig_Loader_Filesystem(SOURCE_PATH), array('autoescape' => false, 'cache' => TMP_PATH . 'twig', 'debug' => true, 'base_template_class' => 'eBuildy\Templating\TwigBaseTemplate'));
+        
+        $env->addGlobal('__template_name', basename($this->templatePath));
+                
+        foreach($this->exposedMethod as $methodName => $method)
+        {
+            if (isset($method['service']))
+            {
+                $env->addFunction($methodName, new \Twig_SimpleFunction($methodName, '$this->container->' . \eBuildy\Helper\ResolverHelper::resolveServiceMethodName($method['service']) . '()->' . $method['method']));
+            }
+            else
+            {
+                $env->addFunction($methodName, new \Twig_SimpleFunction($methodName, '$this->' . $methodName));
+            }
+        }
+        
+        $template = $env->loadTemplate(str_replace(SOURCE_PATH, '', $this->templatePath)); 
+        
+        return $template;
     }
 }

@@ -17,10 +17,21 @@ class Router
     public $securityServiceName;
     
     private $request;
-            
+    private $routesNamed;        
+    
     public function initialize($configuration)
     {
         $this->routes = $configuration['routes'];
+        
+        $this->routesNamed = array();
+        
+        foreach($this->routes as $route)
+        {
+            if ($route['name'] !== null)
+            {
+                $this->routesNamed[$route['name']] = $route;
+            }
+        }
     }
     
     public function matchRequest($request)
@@ -46,12 +57,12 @@ class Router
      */
     public function generate($name, $parameters = array())
     {
-        return $this->bindRoute($this->routes[$name], $parameters);
+        return $this->bindRoute($this->routesNamed[$name], $parameters);
     }
     
     public function get($name)
     {
-        return $this->routes[$name];
+        return $this->routesNamed[$name];
     }
     
     protected function secureRoute($route)

@@ -40,6 +40,13 @@ class TwigBaseTemplate  implements \Twig_TemplateInterface
         
     protected function getAttribute($object, $item, array $arguments = array(), $type = \Twig_TemplateInterface::ANY_CALL, $isDefinedTest = false, $ignoreStrictCheck = false)
     {
-        return $object[$item];
+        if (isset($object[$item]))
+        {
+            return $object[$item];
+        }
+        else 
+        {var_dump($item);die();
+            throw new \Exception($item . ' is not found !');
+        }
     }
 }

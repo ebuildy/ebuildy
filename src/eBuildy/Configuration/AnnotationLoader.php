@@ -83,11 +83,14 @@ class AnnotationLoader
 
                     foreach ($this->parseAnnotations($method->getDocComment()) as $annotation)
                     {
-                        $annotationMethod = substr($annotation, 0, strpos($annotation, '('));
-
-                        if (method_exists($this, $annotationMethod))
+                        if (strpos($annotation, '(') !== false)
                         {
-                            eval('$this->' . $annotation . ';');
+                            $annotationMethod = substr($annotation, 0, strpos($annotation, '('));
+                            
+                            if (strpos($annotationMethod, ' ') === false && method_exists($this, $annotationMethod))
+                            {
+                                eval('$this->' . $annotation . ';');
+                            }
                         }
                     }
                 }
@@ -135,7 +138,7 @@ class AnnotationLoader
             $this->currentPrefix = $pattern;
             return ;
         }
-        
+
         if ($name === 'null')
         {
             $name = str_replace(array('/', '\\'), '_', $pattern);
@@ -146,15 +149,30 @@ class AnnotationLoader
         $pattern = $this->currentPrefix . $pattern;
         
         $route = array( "method"     => $method, 'controller' => $this->currentClass, 'function'   => $this->currentMethod);
-        
+
         if (strpos($pattern, '(') !== false || strpos($pattern, '[') !== false || strpos($pattern, '{') !== false)
         {
             $route['pattern_original'] = $pattern;
             
-            $route['pattern'] =  preg_replace_callback('/\{([a-zA-Z]*)\}/', function($matches)
+            $route['pattern'] =  preg_replace_callback('/\{([^\}]*)\}/', function($matches)
             {
-                return '(?<'.$matches[1].'>([0-9a-zA-Z-]*))';
+                $p = $matches[1];
+                
+                if (strpos($p, '|') === false)
+                {
+                    $regex = '([0-9a-zA-Z-]*)';
+                }
+                else
+                {
+                    $a = strpos($p, '|');
+                                
+                    $regex = substr($p, $a + 1);
+                    $p = substr($p, 0, $a);
+                }
+                
+                return '(?<'.$p.'>' . $regex . ')';
             }, str_replace('/', '\/', $pattern));
+            //var_dump($route['pattern']);
         }
         else
         {
@@ -163,7 +181,9 @@ class AnnotationLoader
         
         $route['security'] = $this->currentSecurity === null ? '' : $this->currentSecurity;
                 
-        $this->routes [$name] = $route;
+        $route['name'] = $name;
+        
+        $this->routes []= $route;
     }
 
     protected function Helper($name)

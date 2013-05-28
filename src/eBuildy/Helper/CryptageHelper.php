@@ -7,6 +7,11 @@ class CryptageHelper
     static public function crypt($message, $key) 
     {
         $result = '';
+        
+        if (!is_string($message))
+        {
+            $message = json_encode($message);
+        }
 
         for($i=1; $i<=strlen($message); $i++)
         {
@@ -38,10 +43,10 @@ class CryptageHelper
 
 
     static public function base64UrlEncode($input) {
-        return strtr(base64_encode($input), '+/=', '-_,');
+        return trim(strtr(base64_encode($input), '+/', '-_'), '=');
     }
 
     static public function base64UrlDecode($input) {
-        return base64_decode(strtr($input, '-_,', '+/='));
+        return base64_decode(strtr($input, '-_', '+/').'==');
     }
 }

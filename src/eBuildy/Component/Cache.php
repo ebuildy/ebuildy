@@ -29,6 +29,11 @@ class Cache
     
     static public function set($target, $content)
     {
+        if (strpos($target, '.php') === false)
+        {
+            $target .= '.php';
+        }
+        
         $buffer = '<?php '.PHP_EOL.'/* Auto generated at '.date(DATE_RSS).' */'.PHP_EOL.PHP_EOL;
         
         $buffer .= '$cache = ' . var_export($content, true). ';';
