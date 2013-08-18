@@ -25,7 +25,7 @@ class Compiler
     {
         $this->templatePath = $templatePath;
         $this->data = $data;
-        
+
         $this->context = str_replace('//', '/', ResolverHelper::getModulePathFromView($templatePath) . '/');
 
 //        $trace=debug_backtrace();
@@ -33,7 +33,14 @@ class Compiler
 //        
 //        debug($caller);
         
-        return $this->__render();
+        $buffer = $this->__render();
+
+	if (!$this->hasBlock('content'))
+	{
+	    $this->setBlock('content', $buffer);
+	}
+	
+	return $buffer;
     }
     
     protected function __render()

@@ -30,7 +30,9 @@ class AnnotationLoader
 
         foreach ($iterator as $module)
         {
-            if ($module->getFilename() !== '.' && $module->getFilename() !== '..')
+            $moduleName = $module->getFilename();
+
+            if ($moduleName[0] !== '.' && $module->isDir())
             {
                 $this->extractModule($module);
             }
@@ -172,13 +174,29 @@ class AnnotationLoader
                 
                 return '(?<'.$p.'>' . $regex . ')';
             }, str_replace('/', '\/', $pattern));
-            //var_dump($route['pattern']);
+	    
+	    $route['pattern_original'] =  preg_replace_callback('/\{([^\}]*)\}/', function($matches) 
+            {
+                $p = $matches[1];
+                
+                if (strpos($p, '|') !== false)
+                {
+                    $a = strpos($p, '|');
+                                
+                    $regex = substr($p, $a + 1);
+                    $p = substr($p, 0, $a);
+		    
+		    $route['pattern_original'] = '{' . $p . '}';
+                }
+                
+                return '{' . $p . '}';
+            }, $pattern);
         }
         else
         {
             $route['path'] = $pattern;
         }
-        
+        //var_dump($route);
         $route['security'] = $this->currentSecurity === null ? '' : $this->currentSecurity;
                 
         $route['name'] = $name;

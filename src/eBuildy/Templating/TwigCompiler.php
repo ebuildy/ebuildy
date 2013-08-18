@@ -4,38 +4,42 @@ namespace eBuildy\Templating;
 
 class TwigCompiler extends Compiler
 {    
+    /**
+     * 1. Set parent blocks
+     * 2. Render template
+     * 3. Get template blocks
+     * 
+     * @return string
+     */
     protected function __render()
     {        
         $target = 'templates/' . basename($this->templatePath).'.php';
         
         $template = $this->_compile();
-//        
-//        $lexer = new \Twig_Lexer($env);
-//        
-//        $parser = new \Twig_Parser($env);
-//        
-//        $stream = $lexer->tokenize(file_get_contents($this->templatePath), $this->templatePath);
-//       
-//        $nodes = $parser->parse($stream);
-//        
-//        $compiler = new \Twig_Compiler($env);
-//        
-//        $compiler->compile($nodes);
-//        
-//        $content = $compiler->getSource();
-//        
-//        \eBuildy\Component\Cache::writeTempFile($target, $content);
-//                
-//        $this->templatePath = TMP_PATH . $target;
-//        
-//        include($this->templatePath);
-        
-        
-        
-        $template->setBlocks($this->blocks);
-        $template->container = $this->container;
+	
+	$template->container = $this->container;        
+	
+	$template->setBlocks($this->getBlocks());
+	
+        $content = $template->render($this->data);
+	
+	$this->setBlocks(array());
+		
+	foreach($template->blocks as $blockId => $block)
+	{
+	    if (is_array($block))
+	    {
+		ob_start();
 
-        return $template->render($this->data);
+		call_user_func_array(array($template, $block[1]), array($this->data));
+
+		$buffer = ob_get_clean();
+
+		$this->setBlock($blockId, $buffer);
+	    }
+	}
+	
+	return $content;
     }
     
     protected function _compile()

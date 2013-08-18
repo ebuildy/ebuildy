@@ -90,7 +90,7 @@ class Form extends DataBinder
         
         foreach($this->children as $child)
         {
-            $dataNormed[$child->name] = $child->getDataNormed();
+	    $dataNormed[$child->name] = $child->getDataNormed();
         }
         
         $this->dataNormed = $dataNormed;

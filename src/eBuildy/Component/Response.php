@@ -43,8 +43,9 @@ class Response
     }
     
     public function removeCookie($name)
-    {
+    {	
         $this->setCookie($name, null, '-= 1 week');
+	//$this->setCookie($name, null, '-= 1 week', '/', '');
     }
 
     public function setContent($content)

@@ -4,22 +4,32 @@ namespace eBuildy\Templating;
 
 trait BlockHelperTrait
 {
-    protected $blocks = array();
+    protected $parentBlocks = array();
     protected $currentBlockId = null;
+    
+    public function getBlocks()
+    {
+	return $this->parentBlocks;
+    }
 
     public function block($id)
     {
-        return isset($this->blocks[$id]) ? $this->blocks[$id] : '';
+        return isset($this->parentBlocks[$id]) ? $this->parentBlocks[$id] : '';
     }
 
     public function setBlock($id, $content)
     {
-        $this->blocks[$id] = $content;
+        $this->parentBlocks[$id] = $content;
     }
     
     public function setBlocks($blocks)
     {
-        $this->blocks = $blocks;
+        $this->parentBlocks = $blocks;
+    }
+    
+    public function hasBlock($id)
+    {
+	return isset($this->parentBlocks[$id]);
     }
 
     protected function beginBlock($id)

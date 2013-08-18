@@ -129,7 +129,7 @@ abstract class DataBinder
         {
             $validators = array($validators);
         }
-        
+	
         foreach($validators as $validator)
         {
             $res = $validator->validate($this->getData());

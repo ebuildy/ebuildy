@@ -89,6 +89,8 @@ class Controller extends ContainerAware
     </body>
 </html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8')));
         
+	$this->response->addHeader('Content-Type', 'text/html');
+	
         return $this->response->render();
     }
         
@@ -109,9 +111,13 @@ class Controller extends ContainerAware
         return $this->response->render();
     }
     
-    protected function  renderJSON($data)
+    protected function renderJSON($data)
     {
-        $this->response->setContent(json_encode($data));
+        $buffer = json_encode($data);
+        
+        $this->response->setContent($buffer);
+        
+        $this->response->addHeader('Content-Length', mb_strlen($buffer));
         
         return $this->response;
     }
@@ -128,5 +134,8 @@ class Controller extends ContainerAware
         return $this->response;
     }
         
-    
+    protected function renderTemplate($template, $data = array())
+    {
+        return $this->renderDecoratedTemplate(array($template), $data);
+    }
 }

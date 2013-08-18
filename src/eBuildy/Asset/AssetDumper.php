@@ -58,7 +58,7 @@ class AssetDumper
             
             $method = $node->getValue();
  
-            if ($method === 'getCss')
+            if ($method === 'getCss' || $method === 'addCss')
             {
                 $type = 'css';
             }

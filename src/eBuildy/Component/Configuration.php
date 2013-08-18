@@ -140,6 +140,15 @@ class Configuration
         {
             $phpContent .= 'protected $' . $this->resolveServicePropertyName($serviceName) . ' = null;' . PHP_EOL;
         }
+        
+        $phpContent .= PHP_EOL;
+        
+        foreach ($this->get('parameters') as $parameterName => $parameter)
+        {            
+            $parameter['debug'] = $frameworkDebug;
+
+            $phpContent .= 'protected $__config_' . $parameterName . ' =  ' . var_export($parameter, true) . ';' . PHP_EOL;
+        }
 
         $phpContent .= PHP_EOL . PHP_EOL;
 
@@ -149,9 +158,7 @@ class Configuration
 
             $phpContent .= 'public function ' . $method . '() {' . PHP_EOL;
 
-            $parameter['debug'] = $frameworkDebug;
-
-            $phpContent .= "\t" . 'return ' . var_export($parameter, true) . ';' . PHP_EOL;
+            $phpContent .= "\t" . 'return $this->__config_' . $parameterName . ';' . PHP_EOL;
 
             $phpContent .= '}' . PHP_EOL . PHP_EOL;
         }

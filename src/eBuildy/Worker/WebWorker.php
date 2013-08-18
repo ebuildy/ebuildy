@@ -31,6 +31,8 @@ class WebWorker extends BaseWorker
     
     public function onException(\Exception $e)
     {  
+	$this->application->onException($e);
+	
         $this->onError($e->getCode(), 'Uncaught exception: ' . $e->getMessage(), $e->getFile(), $e->getLine(), null, $e->getTrace());
     }
 

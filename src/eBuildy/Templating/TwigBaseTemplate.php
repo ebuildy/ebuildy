@@ -6,6 +6,7 @@ class TwigBaseTemplate  implements \Twig_TemplateInterface
 {
     public $env;
     public $container;
+    public $blocks;
     
     use BlockHelperTrait;
     
@@ -40,12 +41,14 @@ class TwigBaseTemplate  implements \Twig_TemplateInterface
         
     protected function getAttribute($object, $item, array $arguments = array(), $type = \Twig_TemplateInterface::ANY_CALL, $isDefinedTest = false, $ignoreStrictCheck = false)
     {
-        if (isset($object[$item]))
+	$item = trim($item);
+	
+        if (array_key_exists($item, $object))
         {
             return $object[$item];
         }
         else 
-        {var_dump($item);die();
+        {
             throw new \Exception($item . ' is not found !');
         }
     }

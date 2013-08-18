@@ -13,6 +13,12 @@ class FormHelper
      */
     public $templatingService;
     
+    /**
+     * @Inject("translator")
+     * @var \eBuildy\Helper\Translator
+     */
+    public $translatorService;
+    
     protected $templatesPath;
     
     public function initialize($config)
@@ -30,10 +36,12 @@ class FormHelper
         if (count($errors) > 0)
         {
             $html = '<div class="alert alert-error"><ul>';
-            
-            foreach($errors as $error)
+
+            foreach($errors as $fieldName => $error)
             {
-                $html .= '<li>' . $error . '</li>';
+                $field = $form->getChild($fieldName);
+                
+                $html .= '<li>' . $this->translatorService->get($error, array('field' => $field->name, 'value' => $field->getData())) . '</li>';
             }
             
             $html .= '</ul></div>';
@@ -49,9 +57,9 @@ class FormHelper
     /**
      * @Expose("form_actions")
      */
-    public function renderActions($value)
+    public function renderActions($value, $type = 'normal')
     {
-        return '<div class="form-actions"><input type="submit" class="btn" value="'.$value.'" /></div>';
+        return '<div class="form-group" style="margin-top:10px"><div class="col-offset-4 col-lg-8 "><input type="submit" class="btn btn-success btn-block" value="'.$value.'" /></div></div>';
     }
             
     /**
@@ -72,9 +80,9 @@ class FormHelper
     /**
      * @Expose("form_row")
      */
-    public function renderField($form, $fieldName)
+    public function renderField($form, $fieldName = null)
     {
-        $control = $form->getChild($fieldName);
+        $control = $control = $fieldName === null ? $form : $form->getChild($fieldName);
         
         $templateComponentPath = $this->templatesPath . $control->getTemplate() . '.phtml';
         
@@ -102,9 +110,9 @@ class FormHelper
     /**
      * @Expose("form_control")
      */
-    public function renderControl($form, $fieldName)
+    public function renderControl($form, $fieldName = null)
     {
-        $control = $form->getChild($fieldName);
+        $control = $fieldName === null ? $form : $form->getChild($fieldName);
         
         $templateComponentPath = $this->templatesPath . $control->getTemplate() . '.phtml';
         
@@ -119,7 +127,7 @@ class FormHelper
         
         return $this->templatingService->renderDecoratedTemplate(array($templateComponentPath), array('id' => $control->name, 'attributes' => $attributes, 'label' => $control->getLabel(), 'value' => $control->getData(), 'errors' => $control->getErrors()));
     }
-    
+        
     /**
      * @Expose("html_attributes")
      */

@@ -8,10 +8,10 @@ namespace eBuildy\Templating;
 class Templating
 {
     protected $templateDirectory = null;
-    protected $variables = array();
     protected $exposeMethods = array();    
     
     public $currentCompiler;
+    public $variables;
     
     private $stackCompilers = array();
         
@@ -20,17 +20,18 @@ class Templating
         if (isset($configuration['exposes']))
         {
             $this->exposeMethods = $configuration['exposes'];
+            $this->variables = new \eBuildy\Helper\ParameterBag();
         }
     }
     
     public function addVariable($name, $value)
     {
-        $this->variables[$name] = $value;
+        $this->variables->set($name, $value);
     }
-    
+        
     public function addVariables($vars)
     {
-        $this->variables = array_merge($this->variables, $vars);
+        $this->variables->add($vars);
     }
     
     public function getContext()
@@ -43,29 +44,32 @@ class Templating
     {
         $compiler = $this->getCompiler($template);
 
-        return $compiler->render($template, array_merge($this->variables, $data));
+        return $compiler->render($template, array_merge($this->variables->all(), $data));
     }
         
     public function renderDecoratedTemplate($templates, $data = array())
     {
         $templateContent = null;
+	$blockPreviousTemplate = null;
         
         foreach($templates as $template)
         {
             $compiler = $this->getCompiler($template);
             
             array_push($this->stackCompilers, $compiler);
-            
-            if ($templateContent !== null)
-            {
-                $compiler->setBlock('content',  $templateContent);
-            }
-            
-            $templateContent = $compiler->render($template, array_merge($this->variables, $data));
-            
+	    
+	    if ($blockPreviousTemplate !== null)
+	    {
+		$compiler->setBlocks($blockPreviousTemplate);
+	    }
+                        
+            $templateContent = $compiler->render($template, array_merge($this->variables->all(), $data));
+	    
+	    $blockPreviousTemplate = $compiler->getBlocks();
+
             array_pop($this->stackCompilers);
         }
-        
+
         return $templateContent;
     }
     
@@ -80,4 +84,6 @@ class Templating
             return new Compiler($this->container, $this->exposeMethods);
         }
     }
+    
+    
 }

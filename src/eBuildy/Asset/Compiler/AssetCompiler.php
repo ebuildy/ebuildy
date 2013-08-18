@@ -15,10 +15,25 @@ abstract class AssetCompiler
     {
         $this->options = $options;
     }
-            
+    
+    /**
+     * Import an asset resource.
+     * Search on:
+     * 1. Current folder
+     * 2. Current module folder
+     * 3. Application source folder
+     * 4. Vendor folder
+     * 5. Root folder
+     * 6. Web folder
+     * 
+     * @param string $pattern
+     * @param boolean $compile
+     * 
+     * @throws \Exception
+     */            
     public function import($pattern, $compile = false)
     {
-        $importSources = array($this->currentFolder . DIRECTORY_SEPARATOR, $this->currentModule . DIRECTORY_SEPARATOR, SOURCE_PATH, VENDOR_PATH, ROOT);
+        $importSources = array($this->currentFolder . DIRECTORY_SEPARATOR, $this->currentModule . DIRECTORY_SEPARATOR, SOURCE_PATH, VENDOR_PATH, ROOT, WEB_PATH);
         
         foreach($importSources as $importSource)
         {
@@ -34,6 +49,8 @@ abstract class AssetCompiler
         {
             throw new \Exception('No files match ' . $pattern . ' Search on ' . var_export($importSources, true));
         }
+        
+        echo '/** Generated at ' . date(DATE_ATOM) . ' **/';
 
         foreach ($files as $filePath)
         {

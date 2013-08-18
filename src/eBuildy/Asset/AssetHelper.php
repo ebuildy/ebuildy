@@ -73,6 +73,20 @@ class AssetHelper
         
         return '<link href="' . $target . '" rel="stylesheet" type="text/css" />';
     }
+    
+    /**
+     * @Expose("addCss")
+     */
+    public function addCSS($source, $options = array())
+    {
+        $target = $this->compile('css', $this->getAssetPath($source), $options);
+        
+        $listCss = $this->templatingService->variables->get('assets_css', array());
+        
+        $listCss []= $target;
+        
+        $this->templatingService->variables->set('assets_css', $listCss);
+    }
 
     /**
      * @Expose("getJs")
