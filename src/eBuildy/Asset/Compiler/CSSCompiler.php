@@ -37,17 +37,7 @@ class CSSCompiler extends AssetCompiler
 
         //var_dump();
 
-        if ($target !== null)
-        {
-            $dir = dirname($target);
-            
-            if (!is_dir($dir))
-            {
-                mkdir($dir, 0777, true);
-            }
-            
-            file_put_contents($target, $res);
-        }
+        $this->saveCompiledFile($res, $target);
 
         return $res;
     }

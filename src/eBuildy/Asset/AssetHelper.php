@@ -58,7 +58,7 @@ class AssetHelper
             $this->forceCompilation = $configuration['compile']['force'];
         }
         
-        if ($configuration['debug'])
+        if (DEBUG)
         {
             $this->version = time();
         }
@@ -81,11 +81,11 @@ class AssetHelper
     {
         $target = $this->compile('css', $this->getAssetPath($source), $options);
         
-        $listCss = $this->templatingService->variables->get('assets_css', array());
+        $listItems = $this->templatingService->variables->get('assets_css', array());
         
-        $listCss []= $target;
+        $listItems []= $target;
         
-        $this->templatingService->variables->set('assets_css', $listCss);
+        $this->templatingService->variables->set('assets_css', $listItems);
     }
 
     /**
@@ -96,6 +96,20 @@ class AssetHelper
         $target = $this->compile('js', $this->getAssetPath($source), $options);
                 
         return '<script src="' . $target . '"></script>';
+    }
+    
+    /**
+     * @Expose("addJs")
+     */
+    public function addJs($source, $options = array())
+    {
+        $target = $this->compile('js', $this->getAssetPath($source), $options);
+        
+        $listItems = $this->templatingService->variables->get('assets_js', array());
+        
+        $listItems []= $target;
+        
+        $this->templatingService->variables->set('assets_js', $listItems);
     }
     
     public function getAssetPath($source)

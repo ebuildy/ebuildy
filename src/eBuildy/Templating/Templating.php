@@ -36,8 +36,7 @@ class Templating
     
     public function getContext()
     {
-    //   return $this->currentCompiler->getContext();
-        return $this->stackCompilers[0]->getContext();
+        return count($this->stackCompilers) === 0 ? null : $this->stackCompilers[0]->getContext();
     }
     
     public function render($template, $data = array())

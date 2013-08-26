@@ -11,7 +11,6 @@ class AnnotationLoader
     private $commands = array();
     private $exposes = array();
     
-    private $currentModule;
     private $currentClass;
     private $currentMethod;
     private $currentService;
@@ -19,33 +18,19 @@ class AnnotationLoader
     private $currentSecurity;
     private $currentPrefix;
     
-    public function load($path)
+    public function load($path, $contextAutoLoad = null)
     {
-        $this->sourceDir  = $path;
+        $this->sourceDir  = $contextAutoLoad === null ? $path : $contextAutoLoad;
         $this->targetPath = TMP_PATH.'annotations_'.md5($path).'.php';
-        
-        $start = microtime(true);
-        
-        $iterator = new \DirectoryIterator($this->sourceDir);
 
-        foreach ($iterator as $module)
-        {
-            $moduleName = $module->getFilename();
-
-            if ($moduleName[0] !== '.' && $module->isDir())
-            {
-                $this->extractModule($module);
-            }
-        }
+        $this->extractModule($path);
         
         return array('parameters' => array('router' => array('routes' => $this->routes), 'templating' => array('exposes' => $this->exposes)), 'services' => $this->services, 'commands' => $this->commands, 'event_listeners' => $this->eventListeners);
     }
 
     protected function extractModule($module)
     {
-        $this->currentModule = $module->getFilename();
-
-        $Iterator  = new \RecursiveIteratorIterator($iterator = new \RecursiveDirectoryIterator($module->getPathname()));
+        $Iterator  = new \RecursiveIteratorIterator($iterator = new \RecursiveDirectoryIterator($module));
         $Regex     = new \RegexIterator($Iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
 
         foreach ($Regex as $file => $vv)
@@ -62,6 +47,8 @@ class AnnotationLoader
             }
             catch(\ReflectionException $e)
             {
+                var_dump($e->getMessage());
+                
                 continue ;
             }
 

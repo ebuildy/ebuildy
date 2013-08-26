@@ -29,6 +29,11 @@
             
             array_shift($argv);
             
+            if (count($argv) > 1 && $argv[1] === 'config')
+            {
+                define("__CONFIGURATION_MODE__", true);
+            }
+                        
             include("./web/index.php");
         }
     }

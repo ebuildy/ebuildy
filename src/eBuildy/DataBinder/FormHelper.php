@@ -35,7 +35,7 @@ class FormHelper
         
         if (count($errors) > 0)
         {
-            $html = '<div class="alert alert-error"><ul>';
+            $html = '<div class="alert alert-danger"><ul>';
 
             foreach($errors as $fieldName => $error)
             {
@@ -59,7 +59,7 @@ class FormHelper
      */
     public function renderActions($value, $type = 'normal')
     {
-        return '<div class="form-group" style="margin-top:10px"><div class="col-offset-4 col-lg-8 "><input type="submit" class="btn btn-success btn-block" value="'.$value.'" /></div></div>';
+        return '<div class="form-group" style="margin-top:10px"><div class="col-sm-offset-4 col-sm-8 "><input type="submit" class="btn btn-success btn-block" value="'.$value.'" /></div></div>';
     }
             
     /**

@@ -9,19 +9,8 @@ class JSCompiler extends AssetCompiler
     protected function doCompile($source, $target)
     {
         $this->content = $this->compileFile($source);
-
-        if ($target !== null)
-        {
-            $dir = dirname($target);
-            
-            if (!is_dir($dir))
-            {
-                mkdir($dir, 0777, true);
-            }
-            
-            file_put_contents($target, $this->content);
-            chmod($target, 0644);
-        }
+        
+        $this->saveCompiledFile($this->content, $target);
         
         return $this->content;
     }

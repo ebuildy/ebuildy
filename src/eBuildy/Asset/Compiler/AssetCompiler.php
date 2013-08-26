@@ -93,12 +93,29 @@ abstract class AssetCompiler
 
     protected function preCompile($content)
     {
-        return str_replace(array('/**', '**/'), array('<?php ', ' ?>'), $content);
+        return str_replace(array('/** ', ' **/'), array('<?php ', ' ?>'), $content);
     }
     
     protected function postCompile($content)
     {
         return $content;
+    }
+    
+    protected function saveCompiledFile($content, $target)
+    {
+        if ($target !== null)
+        {
+            $dir = dirname($target);
+            
+            if (!is_dir($dir))
+            {
+                mkdir($dir, 0755, true);
+            }
+            
+            file_put_contents($target, $content);
+            
+            exec('/usr/bin/yui-compressor ' . $target . ' -o ' . $target . ' --charset utf-8  2>&1');
+        }
     }
     
     protected function resolveFilePath($file)

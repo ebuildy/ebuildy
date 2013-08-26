@@ -1,13 +1,13 @@
 <?php
 
-namespace eBuildy\Component;
+namespace eBuildy\Container;
 
 use eBuildy\Component\Cache;
 use eBuildy\Configuration\AnnotationLoader;
 use eBuildy\Helper\ResolverHelper;
 use Symfony\Component\Yaml\Yaml;
 
-class Configuration
+class ContainerBuilder
 {
     private $configuration = array();
 
@@ -66,14 +66,16 @@ class Configuration
         return $this->getNode($name, $default);
     }
 
-    public function loadAnnotations($path)
+    public function loadAnnotations($path, $contextAutoload = null)
     {
         $loader = new AnnotationLoader();
 
-        foreach ($loader->load($path) as $k => $v)
+        foreach ($loader->load($path, $contextAutoload) as $k => $v)
         {
             $this->addNode($k, $v);
         }
+        
+        return $this;
     }
 
     public function loadFile($source, $parameters = array())
@@ -122,17 +124,19 @@ class Configuration
         {
             $this->addNode($k, $v);
         }
+        
+        return $this;
     }
 
-    public function buildContainer($filePath)
+    public function build($dir, $name)
     {
-        $phpContent = '<?php ' . PHP_EOL . PHP_EOL . 'class Container extends \eBuildy\Container\BaseContainer {' . PHP_EOL . PHP_EOL;
+        $phpContent = '<?php ' . PHP_EOL . PHP_EOL . 'class ' . $name . ' extends \eBuildy\Container\BaseContainer {' . PHP_EOL . PHP_EOL;
         
         $phpContent .= 'public $commands = ' . var_export($this->configuration['commands'], true) . ';' . PHP_EOL;        
         
         $phpContent .= 'public $eventListeners = ' . var_export($this->configuration['event_listeners'], true) . ';' . PHP_EOL;        
         
-        $frameworkDebug = $this->configuration['parameters']['ebuildy']['debug'];
+       // $frameworkDebug = $this->configuration['parameters']['ebuildy']['debug'];
         
         $services   = $this->get('services');
 
@@ -145,7 +149,7 @@ class Configuration
         
         foreach ($this->get('parameters') as $parameterName => $parameter)
         {            
-            $parameter['debug'] = $frameworkDebug;
+           // $parameter['debug'] = $frameworkDebug;
 
             $phpContent .= 'protected $__config_' . $parameterName . ' =  ' . var_export($parameter, true) . ';' . PHP_EOL;
         }
@@ -205,8 +209,11 @@ class Configuration
 
         $phpContent.= '}';
         //         die($phpContent);
-        file_put_contents($filePath, $phpContent);
-        chmod($filePath, 0644);
+        file_put_contents($dir . DIRECTORY_SEPARATOR . $name . '.php', $phpContent);
+        
+        chmod($dir . DIRECTORY_SEPARATOR . $name . '.php', 0644);
+        
+        return $this;
     }
 
     protected function resolveServicePropertyName($service)
