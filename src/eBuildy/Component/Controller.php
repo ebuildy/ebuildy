@@ -52,6 +52,19 @@ class Controller extends ContainerAware
         
     }
     
+    
+    protected function getInput($value, $label = '', $transformers = null, $validators = null)
+    {
+        $value = $this->request->get($value);
+        
+        if ($transformers !== null && $validators !== null)
+        {
+            $value = \eBuildy\DataBinder\DataBinderHelper::get($value, $label, $transformers, $validators);
+        }
+        
+        return $value;
+    }
+    
      /**
      * Generates a URL from the given parameters.
      *

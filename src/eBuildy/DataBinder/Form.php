@@ -6,6 +6,13 @@ class Form extends DataBinder
 {    
     protected $children = array();
     
+    public function __construct($name = '', $options = array()) 
+    {
+        parent::__construct($name, $options);
+        
+        $this->preTransforms = array();
+    }
+    
     public function addChild(DataBinder $value)
     {
         $this->children[$value->name] = $value;
@@ -63,7 +70,7 @@ class Form extends DataBinder
             }
         }
         
-        parent::setData($value);
+        parent::setData($value);        
     }
     
     public function setDataNormed($value)

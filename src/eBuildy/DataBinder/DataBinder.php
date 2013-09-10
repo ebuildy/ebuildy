@@ -2,6 +2,8 @@
 
 namespace eBuildy\DataBinder;
 
+use eBuildy\DataBinder\Validator\StringValidator;
+
 abstract class DataBinder
 {
     public $name;
@@ -10,9 +12,46 @@ abstract class DataBinder
     protected $dataNormed;
     protected $errors = array();
     
-    public function __construct($name = '')
+    protected $options;
+    protected $preTransforms;
+    
+    public function __construct($name = '', $options = array())
     {
         $this->name = $name;
+        $this->options = $options;
+        
+        $defaultPreTransforms = array('trim', 'eBuildy\DataBinder\DataBinderHelper::my_htmlentities');
+
+        if (isset($options['pre_transforms']))
+        {
+            $this->preTransforms = array_merge($defaultPreTransforms, $options['pre_transforms']);
+        }
+        else
+        {
+            $this->preTransforms = $defaultPreTransforms;
+        }
+        
+        if (isset($options['required']) && $options['required'] === true)
+        {
+            if (!isset($options['validators']))
+            {
+                $options['validators'] = array();
+            }
+
+            $options['validators'] []= new StringValidator(array('required' => true));
+        }
+    }
+    
+    public function getOptions($field = null, $default = null)
+    {
+        if ($field === null)
+        {
+            return $this->options;
+        }
+        else
+        {
+            return isset($this->options[$field]) ? $this->options[$field] : $default;
+        }
     }
     
     /**
@@ -25,7 +64,7 @@ abstract class DataBinder
     public function bind($value)
     {
         $this->errors = array();
-        
+
         $this->setData($value);
         
         return $this->isValid();
@@ -58,6 +97,14 @@ abstract class DataBinder
      */
     public function setData($value)
     {
+        if ($this->preTransforms !== null)
+        {
+            foreach($this->preTransforms as $transformMethod)
+            {
+                $value = call_user_func($transformMethod, $value);
+            }
+        }
+        
         $this->data = $value;
         
         $this->transform();

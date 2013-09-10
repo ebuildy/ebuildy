@@ -10,12 +10,11 @@ class EmailValidator extends StringValidator
     static public $ERROR_SYNTAX_INVALID = 'validator.email.syntax';
     static public $ERROR_HOST_VALID = 'validator.email.host';
     
-    public function __construct($options = array())
+    public function __construct($required, $checkMx = false, $checkHost = false)
     {        
-         parent::__construct($options);
+         parent::__construct($required);
          
-        $this->mergeOptions(array('checkMX' => false, 'checkHost' => false));
-        $this->mergeOptions($options);
+        $this->mergeOptions(array('checkMX' => $checkMx, 'checkHost' => $checkHost));
     }
     
     public function validate($value)
