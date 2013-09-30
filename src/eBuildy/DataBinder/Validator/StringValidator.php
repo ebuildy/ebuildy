@@ -2,9 +2,6 @@
 
 namespace eBuildy\DataBinder\Validator;
 
-/**
- * @Service("validator.string")
- */
 class StringValidator extends Validator
 {    
     static public $ERROR_TOO_MAX = 'validator.string.max';
@@ -21,7 +18,7 @@ class StringValidator extends Validator
     {
         $s = strlen($value);
         
-        if ($this->options['required'] && ($value === null || $s == 0))
+        if ($this->options['required'] && $s == 0)
         {
             return self::$ERROR_REQUIRED;
         }

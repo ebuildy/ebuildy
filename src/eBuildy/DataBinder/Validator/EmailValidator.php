@@ -2,15 +2,12 @@
 
 namespace eBuildy\DataBinder\Validator;
 
-/**
- * @Service("validator.email")
- */
 class EmailValidator extends StringValidator
 {
     static public $ERROR_SYNTAX_INVALID = 'validator.email.syntax';
     static public $ERROR_HOST_VALID = 'validator.email.host';
     
-    public function __construct($required, $checkMx = false, $checkHost = false)
+    public function __construct($required = false, $checkMx = false, $checkHost = false)
     {        
          parent::__construct($required);
          

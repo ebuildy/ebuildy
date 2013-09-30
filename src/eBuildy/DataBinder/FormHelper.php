@@ -78,6 +78,34 @@ class FormHelper
     }
     
     /**
+     * @Expose("form_row_inline")
+     */
+    public function renderFieldInline($name, $template, $label = null, $value = null, $rowTemplate = '__row.phtml', $attributes = array())
+    {        
+        $templateComponentPath = $this->templatesPath . $template . '.phtml';
+        
+        $attributes = array_merge(
+                $attributes,
+                array(
+                    'id' => 'input' . $name,
+                    'name' => $name,
+                    'value' => $value
+                )
+        );
+        
+        if ($rowTemplate === null)
+        {
+            return $this->templatingService->renderDecoratedTemplate(array($templateComponentPath), array('id' => $name,  'attributes' => $attributes,  'label' => $label, 'value' => $value, 'errors' => null));
+        }
+        else
+        {        
+            $templateRowPath = $this->templatesPath . $rowTemplate;
+        
+            return $this->templatingService->renderDecoratedTemplate(array($templateComponentPath, $templateRowPath), array('id' => $name,  'attributes' => $attributes, 'label' => $label, 'value' => $value, 'errors' => null));
+        }
+    }
+    
+    /**
      * @Expose("form_row")
      */
     public function renderField($form, $fieldName = null)
