@@ -11,7 +11,7 @@ class CSSCompiler extends AssetCompiler
     
     protected function doCompile($source, $target)
     {
-        if (file_exists($target))
+        if ($target !== null && file_exists($target))
         {
             unlink($target);
         }
@@ -20,26 +20,29 @@ class CSSCompiler extends AssetCompiler
         {
             $this->currentSource = $this->resolveFilePath($source);
 
-            $res = shell_exec('lessc ' . $this->currentSource . ' --include-path="' . SOURCE_PATH . ':' . VENDOR_PATH . ':' . ROOT . '" 2> /tmp/output');
+            $this->content = shell_exec('lessc ' . $this->currentSource . ' --include-path="' . SOURCE_PATH . ':' . VENDOR_PATH . ':' . ROOT . '" 2> /tmp/output');
 
-            if ($res === null)
+            if ($this->content === null)
             {       
                 throw new \Exception('Error occured compiling '. $source. ' : '. print_r(file('/tmp/output'), true));
             }
         }
         else
         {
-//            $res = file_get_contents($source);
+//            $this->content = file_get_contents($source);
 //
 //            copy($source, $target);
-                $res = $this->compileFile($source);
+                $this->content = $this->compileFile($source);
         }
 
         //var_dump();
 
-        $this->saveCompiledFile($res, $target);
+        if ($target !== null)
+        {
+            $this->saveCompiledFile($this->content, $target);
+        }
 
-        return $res;
+        return $this->content;
     }
 
     protected function postCompile($content)

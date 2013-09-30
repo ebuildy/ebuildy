@@ -10,11 +10,11 @@ class JSCompiler extends AssetCompiler
     {
         $this->content = $this->compileFile($source);
         
-        $this->saveCompiledFile($this->content, $target);
+        if ($target !== null)
+        {        
+            $this->saveCompiledFile($this->content, $target);
+        }
         
         return $this->content;
     }
-
-
-
 }

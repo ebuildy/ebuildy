@@ -62,7 +62,7 @@ class AssetDumper
             {
                 $type = 'css';
             }
-            elseif ($method === 'getJs')
+            elseif ($method === 'getJs' || $method === 'addJs')
             {
                 $type = 'js';
             }

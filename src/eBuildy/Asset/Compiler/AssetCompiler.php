@@ -69,6 +69,18 @@ abstract class AssetCompiler
         }
     }
     
+    public function compileGroup($sources, $target, $data = array())
+    {
+        $buffer = '';
+        
+        foreach($sources as $source)
+        {
+            $buffer .= $this->compile($source, null, $data);
+        }
+        
+        $this->saveCompiledFile($buffer, $target);
+    }
+    
     public function compile($source, $target = null, $data = array())
     {
         $this->currentData   = $data;
@@ -114,7 +126,7 @@ abstract class AssetCompiler
             
             file_put_contents($target, $content);
             
-            exec('/usr/bin/yui-compressor ' . $target . ' -o ' . $target . ' --charset utf-8  2>&1');
+            //exec('/usr/bin/yui-compressor ' . $target . ' -o ' . $target . ' --charset utf-8  2>&1');
         }
     }
     

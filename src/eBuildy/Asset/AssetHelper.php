@@ -37,6 +37,10 @@ class AssetHelper
      */
     public $version = 4;
     
+    public $groups;
+    
+    public $expandGroups = false;
+    
    /**
      * Configuration("version_format")
      */
@@ -50,17 +54,13 @@ class AssetHelper
         $this->cssPath = $configuration['uri'] . 'css/';
         $this->jsPath  = $configuration['uri'] . 'js/';
         $this->version = isset($configuration['version']) ? $configuration['version'] : null;
+        $this->groups = isset($configuration['groups']) ? $configuration['groups'] : null;
         $this->versionFormat = isset($configuration['version_format']) ? $configuration['version_format'] : '{name}.{extension}?v={version}';
         
         if (isset($configuration['compile']))
         {
             $this->enableCompilation = $configuration['compile']['enabled'];
             $this->forceCompilation = $configuration['compile']['force'];
-        }
-        
-        if (DEBUG)
-        {
-            $this->version = time();
         }
     }
 
@@ -69,17 +69,29 @@ class AssetHelper
      */
     public function css($source, $options = array())
     {
-        $target = $this->compile('css', $this->getAssetPath($source), $options);
+        if ($this->expandGroups && $this->isGroup('css', $source))
+        {
+            $html = '';
+
+            foreach($this->groups['css'][$source] as $asset)
+            {
+                $html .= $this->css($asset, $options) . PHP_EOL;
+            }
+
+            return trim($html);
+        }
+        
+        $target = $this->compile('css', $source, $options);
         
         return '<link href="' . $target . '" rel="stylesheet" type="text/css" />';
     }
-    
+        
     /**
      * @Expose("addCss")
      */
     public function addCSS($source, $options = array())
     {
-        $target = $this->compile('css', $this->getAssetPath($source), $options);
+        $target = $this->compile('css', $source, $options);
         
         $listItems = $this->templatingService->variables->get('assets_css', array());
         
@@ -93,7 +105,7 @@ class AssetHelper
      */
     public function js($source, $options = array())
     {
-        $target = $this->compile('js', $this->getAssetPath($source), $options);
+        $target = $this->compile('js', $source, $options);
                 
         return '<script src="' . $target . '"></script>';
     }
@@ -103,7 +115,7 @@ class AssetHelper
      */
     public function addJs($source, $options = array())
     {
-        $target = $this->compile('js', $this->getAssetPath($source), $options);
+        $target = $this->compile('js', $source, $options);
         
         $listItems = $this->templatingService->variables->get('assets_js', array());
         
@@ -116,7 +128,7 @@ class AssetHelper
     {
         $sourcePath = AssetResolver::resolveSourcePath($source, $this->templatingService->getContext());
         
-        if ($sourcePath === null)
+        if ($sourcePath === null || $sourcePath === false)
         {
             debug("Context", $this->templatingService->getContext());
             
@@ -126,12 +138,47 @@ class AssetHelper
         return $sourcePath;
     }
     
+    private function getGroupAssetPath($type, $sources)
+    {
+        $sourcePath = array();
+        
+        foreach($sources as $source)
+        {
+            if ($this->isGroup($type, $source))
+            {
+                $sourcePath = array_merge($sourcePath, $this->getGroupAssetPath($type, $this->groups[$type][$source]));
+            }
+            else
+            {
+                $sourcePath []= $this->getAssetPath($source);
+            }
+        }
+        
+        return $sourcePath;
+    }
+    
     public function compile($type, $source, $options = array(), $force = false)
     {
-        $targetFileName   = AssetResolver::resolveRessourceName($source, $options);
+        if ($this->isGroup($type, $source))
+        {
+            $grouping = true;
+            
+            $sourcePath = $this->getGroupAssetPath($type, $this->groups[$type][$source]);
+            $targetFileName   = $source;
+        }
+        else
+        {
+            $grouping = false;
+            
+            $sourcePath       = $this->getAssetPath($source);
+            $targetFileName   = AssetResolver::resolveRessourceName($sourcePath, $options);
+        }
+        
         $targetUri             = ($type === 'js' ? $this->jsPath : $this->cssPath) . AssetResolver::resolveNameWithVersion($targetFileName, $type, $this->version, $this->versionFormat);
         $targetFilePath     = WEB_PATH . AssetResolver::resolveNameForCompilation($targetUri);
-                
+
+        $doCompilation = false;
+        
         if ($force || $this->forceCompilation)
         {
             $doCompilation = true;
@@ -142,20 +189,26 @@ class AssetHelper
             {
                 $doCompilation = true;
             }
-            elseif (filemtime($source) > filemtime($targetFilePath))
+            elseif ($grouping)
+            {
+                foreach($sourcePath as $source)
+                {
+                    $m = filemtime($targetFilePath);
+                    
+                    if (filemtime($source) > $m)
+                    {
+                        $doCompilation = true;
+                        
+                        break;
+                    }
+                }
+            }
+            elseif (filemtime($sourcePath) > filemtime($targetFilePath))
             {
                 $doCompilation = true;
             }
-            else
-            {
-                $doCompilation = false;
-            }
         }
-        else
-        {
-            $doCompilation = false;
-        }
-                
+
         if ($doCompilation)
         {
             if ($type === 'js')
@@ -166,10 +219,22 @@ class AssetHelper
             {
                 $compiler = new Compiler\CSSCompiler($options);
             }
-
-            $compiler->compile($source, $targetFilePath);
+            
+            if ($grouping)
+            {
+                $compiler->compileGroup($sourcePath, $targetFilePath);
+            }
+            else
+            {
+                $compiler->compile($sourcePath, $targetFilePath);
+            }
         }
-        
+
         return $targetUri;
+    }
+    
+    private function isGroup($type, $name)
+    {
+        return isset($this->groups[$type][$name]);
     }
 }
