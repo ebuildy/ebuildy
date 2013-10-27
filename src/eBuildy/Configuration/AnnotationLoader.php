@@ -51,7 +51,7 @@ class AnnotationLoader
                 
                 continue ;
             }
-
+			
             foreach ($this->parseAnnotations($r->getDocComment()) as $annotation)
             {
                 $method = substr($annotation, 0, strpos($annotation, '('));
@@ -128,9 +128,9 @@ class AnnotationLoader
             return ;
         }
 
-        if ($name === 'null')
+        if ($name === 'null' || $name === null)
         {
-            $name = str_replace(array('/', '\\'), '_', $pattern);
+            $name = \eBuildy\Helper\RandomHelper::generateRandomString(12);
         }
        // echo $this->currentClass. ' : ' .$this->currentMethod . PHP_EOL;
         //echo $name .' : '.$this->currentPrefix . ' - ' . $pattern . PHP_EOL;
@@ -184,11 +184,13 @@ class AnnotationLoader
             $route['path'] = $pattern;
         }
         //var_dump($route);
-        $route['security'] = $this->currentSecurity === null ? '' : $this->currentSecurity;
-                
-        $route['name'] = $name;
-        
-        $this->routes []= $route;
+                       
+		if (isset($this->routes[$name]))
+		{
+			throw new \Exception("The route " . $name . " already exist: " . json_encode($this->routes[$name]));
+		}
+		
+        $this->routes[$name] = $route;
     }
 
     protected function Helper($name)

@@ -16,22 +16,11 @@ class Router
     public $routes;
     public $securityServiceName;
     
-    private $request;
-    private $routesNamed;        
+    private $request;     
     
     public function initialize($configuration)
     {
         $this->routes = $configuration['routes'];
-        
-        $this->routesNamed = array();
-        
-        foreach($this->routes as $route)
-        {
-            if ($route['name'] !== null)
-            {
-                $this->routesNamed[$route['name']] = $route;
-            }
-        }
     }
     
     public function matchRequest($request)
@@ -55,19 +44,19 @@ class Router
     /**
      * @Expose("getUrl")
      */
-    public function generate($name, $parameters = array())
+    public function generate($name, $parameters = array(), $absolute = false)
     {
-        return $this->bindRoute($this->routesNamed[$name], $parameters);
+        return ($absolute ? "http://www.kinoulink.com" : "") . $this->bindRoute($this->routes[$name], $parameters);
     }
     
     public function get($name)
     {
-        return $this->routesNamed[$name];
+        return $this->routes[$name];
     }
     
     protected function secureRoute($route)
     {
-        if ($route['security'] !== null && isset($route['security']['role']))
+        if (isset($route['security']) && $route['security'] !== null && isset($route['security']['role']))
         {
             if ($this->get($this->securityServiceName)->checkRole($route['security']['role']) === false)
             {            
