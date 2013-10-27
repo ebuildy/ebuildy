@@ -126,7 +126,10 @@ abstract class AssetCompiler
             
             file_put_contents($target, $content);
             
-            //exec('/usr/bin/yui-compressor ' . $target . ' -o ' . $target . ' --charset utf-8  2>&1');
+            if (isset($this->options['optimize']) && $this->options['optimize'])
+            {
+                exec('/usr/bin/yui-compressor ' . $target . ' -o ' . $target . ' --charset utf-8  2>&1');
+            }
         }
     }
     

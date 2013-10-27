@@ -41,7 +41,7 @@ class TwigBaseTemplate  implements \Twig_TemplateInterface
         
     protected function getAttribute($object, $item, array $arguments = array(), $type = \Twig_TemplateInterface::ANY_CALL, $isDefinedTest = false, $ignoreStrictCheck = false)
     {
-	$item = trim($item);
+		$item = trim($item);
 	
         if (array_key_exists($item, $object))
         {
@@ -49,7 +49,7 @@ class TwigBaseTemplate  implements \Twig_TemplateInterface
         }
         else 
         {
-            throw new \Exception($item . ' is not found !');
+            throw new \Twig_Error('Twig error: variable ' . $item . ' doest not exist!');
         }
     }
 }

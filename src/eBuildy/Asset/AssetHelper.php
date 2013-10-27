@@ -69,7 +69,7 @@ class AssetHelper
      */
     public function css($source, $options = array())
     {
-        if ($this->expandGroups && $this->isGroup('css', $source))
+        if ($this->expandGroups && $this->isGroup($source))
         {
             $html = '';
 
@@ -129,9 +129,7 @@ class AssetHelper
         $sourcePath = AssetResolver::resolveSourcePath($source, $this->templatingService->getContext());
         
         if ($sourcePath === null || $sourcePath === false)
-        {
-            debug("Context", $this->templatingService->getContext());
-            
+        {            
             throw new \Exception("The asset " . $source ." is not found !");
         }
         
@@ -144,7 +142,7 @@ class AssetHelper
         
         foreach($sources as $source)
         {
-            if ($this->isGroup($type, $source))
+            if ($this->isGroup($source))
             {
                 $sourcePath = array_merge($sourcePath, $this->getGroupAssetPath($type, $this->groups[$type][$source]));
             }
@@ -158,83 +156,94 @@ class AssetHelper
     }
     
     public function compile($type, $source, $options = array(), $force = false)
-    {
-        if ($this->isGroup($type, $source))
+    {        
+        if ($this->isGroup($source))
         {
             $grouping = true;
             
-            $sourcePath = $this->getGroupAssetPath($type, $this->groups[$type][$source]);
             $targetFileName   = $source;
         }
         else
         {
             $grouping = false;
             
-            $sourcePath       = $this->getAssetPath($source);
-            $targetFileName   = AssetResolver::resolveRessourceName($sourcePath, $options);
+            $targetFileName   = md5($this->templatingService->getContext() . $source);
         }
         
-        $targetUri             = ($type === 'js' ? $this->jsPath : $this->cssPath) . AssetResolver::resolveNameWithVersion($targetFileName, $type, $this->version, $this->versionFormat);
-        $targetFilePath     = WEB_PATH . AssetResolver::resolveNameForCompilation($targetUri);
-
+        $targetUri = ($type === 'js' ? $this->jsPath : $this->cssPath) . AssetResolver::resolveNameWithVersion($targetFileName, $type, $this->version, $this->versionFormat);
+        
         $doCompilation = false;
         
-        if ($force || $this->forceCompilation)
+        if ($this->enableCompilation)
         {
-            $doCompilation = true;
-        }
-        elseif ($this->enableCompilation)
-        {
-            if (!file_exists($targetFilePath))
-            {
-                $doCompilation = true;
-            }
-            elseif ($grouping)
-            {
-                foreach($sourcePath as $source)
-                {
-                    $m = filemtime($targetFilePath);
-                    
-                    if (filemtime($source) > $m)
-                    {
-                        $doCompilation = true;
-                        
-                        break;
-                    }
-                }
-            }
-            elseif (filemtime($sourcePath) > filemtime($targetFilePath))
-            {
-                $doCompilation = true;
-            }
-        }
-
-        if ($doCompilation)
-        {
-            if ($type === 'js')
-            {
-                $compiler = new Compiler\JSCompiler($options);
-            }
-            elseif ($type === 'css')
-            {
-                $compiler = new Compiler\CSSCompiler($options);
-            }
-            
             if ($grouping)
             {
-                $compiler->compileGroup($sourcePath, $targetFilePath);
+                $sourcePath = $this->getGroupAssetPath($type, $this->groups[$type][$source]);
             }
             else
             {
-                $compiler->compile($sourcePath, $targetFilePath);
+                $sourcePath = $this->getAssetPath($source);
+            }
+            
+            $targetFilePath     = WEB_PATH . AssetResolver::resolveNameForCompilation($targetUri);
+        
+            if ($force || $this->forceCompilation)
+            {
+                $doCompilation = true;
+            }
+            elseif ($this->enableCompilation)
+            {
+                if (!file_exists($targetFilePath))
+                {
+                    $doCompilation = true;
+                }
+                elseif ($grouping)
+                {
+                    foreach($sourcePath as $source)
+                    {
+                        $m = filemtime($targetFilePath);
+
+                        if (filemtime($source) > $m)
+                        {
+                            $doCompilation = true;
+
+                            break;
+                        }
+                    }
+                }
+                elseif (filemtime($sourcePath) > filemtime($targetFilePath))
+                {
+                    $doCompilation = true;
+                }
+            }
+
+            if ($doCompilation)
+            {
+                if ($type === 'js')
+                {
+                    $compiler = new Compiler\JSCompiler($options);
+                }
+                elseif ($type === 'css')
+                {
+                    $compiler = new Compiler\CSSCompiler($options);
+                }
+
+                if ($grouping)
+                {
+                    $compiler->compileGroup($sourcePath, $targetFilePath);
+                }
+                else
+                {
+                    $compiler->compile($sourcePath, $targetFilePath);
+                }
             }
         }
 
         return $targetUri;
     }
     
-    private function isGroup($type, $name)
+    private function isGroup($name)
     {
-        return isset($this->groups[$type][$name]);
+        return !strpos($name, '.');
     }
 }

@@ -66,7 +66,7 @@ class Response
             {
                 setcookie($name, $cookie['value'], $cookie['expire'], $cookie['path'], $cookie['domain'], $cookie['secure'], $cookie['httponly']);
             }
-            
+
             die($this->rawContent);
         }
         else
