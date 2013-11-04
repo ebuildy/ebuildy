@@ -49,7 +49,7 @@ class TwigBaseTemplate  implements \Twig_TemplateInterface
         }
         else 
         {
-            throw new \Twig_Error('Twig error: variable ' . $item . ' doest not exist!');
+            throw new \Twig_Error('Twig error: variable "' . $item . '" doest not exist!');
         }
     }
 }

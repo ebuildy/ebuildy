@@ -7,11 +7,12 @@ class Twig_Node_Expression_GetAttr extends Twig_Node_Expression
         parent::__construct(array('node' => $node, 'attribute' => $attribute, 'arguments' => $arguments), array('type' => $type, 'is_defined_test' => false, 'ignore_strict_check' => false, 'disable_c_ext' => false), $lineno);
     }
     
-    
     public function compile(Twig_Compiler $compiler)
     {
-        $compiler->subcompile($this->getNode('node'));
+		$this->getNode('node')->setAttribute('ignore_strict_check', true);
+		
+		$compiler->subcompile($this->getNode('node'));
 
-        $compiler->raw('[')->subcompile(trim($this->getNode('attribute')))->raw(']');
+        $compiler->raw('[')->subcompile($this->getNode('attribute'))->raw(']');
     }
 }

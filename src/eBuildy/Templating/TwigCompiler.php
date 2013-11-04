@@ -46,6 +46,8 @@ class TwigCompiler extends Compiler
     {
         $env = new \Twig_Environment(new \Twig_Loader_Filesystem(SOURCE_PATH), array('autoescape' => false, 'cache' => TMP_PATH . 'twig', 'debug' => true, 'base_template_class' => 'eBuildy\Templating\TwigBaseTemplate'));
         
+		$env->registerUndefinedFunctionCallback(array($this, "undefinedFunctionCallback"));
+		
         $env->addGlobal('__template_name', basename($this->templatePath));
                 
         foreach($this->exposedMethod as $methodName => $method)
@@ -64,4 +66,9 @@ class TwigCompiler extends Compiler
         
         return $template;
     }
+	
+	public function undefinedFunctionCallback($function)
+	{
+		return new \Twig_SimpleFunction($function, $function);
+	}
 }
