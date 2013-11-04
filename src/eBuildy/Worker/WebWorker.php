@@ -7,7 +7,7 @@ class WebWorker extends BaseWorker
     public function initialize($inputGet, $inputPost, $inputCookie, $inputFile, $inputServer)
     {
         $this->input = new \eBuildy\Component\Request();
-        $this->output = new \eBuildy\Component\Response();
+        $this->output = new \eBuildy\Component\Response('', array('Content-Type' => 'text/html; charset=utf-8'));
         
         $this->input->initialize($inputGet, $inputPost, array(), $inputCookie, $inputFile, $inputServer);
     }
