@@ -70,12 +70,13 @@ class Controller extends ContainerAware
      *
      * @param string  $route      The name of the route
      * @param mixed   $parameters An array of parameters
+	 * @param boolean $absolute 
      *
      * @return string The generated URL
      */
-    public function generateUrl($route, $parameters = array())
+    public function generateUrl($route, $parameters = array(), $absolute = false)
     {
-        return $this->get('router')->generate($route, $parameters);
+        return $this->get('router')->generate($route, $parameters, $absolute);
     }
     
     /**
