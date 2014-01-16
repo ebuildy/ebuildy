@@ -19,7 +19,7 @@
     "mikejestes/scheezy": "dev-master"
   },
   "autoload": {
-    "psr-0": {"ebuildy": "src/", "Twig_Node_Expression_" : "src/eBuildy/Templating/Twig/GetAttr.php"},
+    "psr-0": {"eBuildy": "src/", "Twig_Node_Expression_" : "src/eBuildy/Templating/Twig/GetAttr.php"},
     "classmap": ["src/eBuildy/Templating/Twig/GetAttr.php", "src/eBuildy/Templating/Twig/ExpressionName.php"]
   }
 }
