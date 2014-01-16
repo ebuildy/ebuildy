@@ -38,14 +38,14 @@ abstract class AssetCompiler
         foreach($importSources as $importSource)
         {
             $files = glob($importSource . $pattern);
-            
-            if (count($files) > 0)
+			
+            if (!empty($files) > 0)
             {
                 break;
             }
         }
-
-        if (count($files) == 0)
+		
+        if (empty($files))
         {
             throw new \Exception('No files match ' . $pattern . ' Search on ' . var_export($importSources, true));
         }

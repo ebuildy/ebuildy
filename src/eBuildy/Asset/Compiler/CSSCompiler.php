@@ -18,13 +18,16 @@ class CSSCompiler extends AssetCompiler
 
         if (strpos($source, '.less') !== false)
         {
+			$errorLog = TMP_PATH . 'css_compiler_error.log';
+			
             $this->currentSource = $this->resolveFilePath($source);
 
-            $this->content = shell_exec('lessc ' . $this->currentSource . ' --include-path="' . SOURCE_PATH . ':' . VENDOR_PATH . ':' . ROOT . '" 2> /tmp/output');
+            $this->content = shell_exec('lessc ' . $this->currentSource . ' --include-path="' . SOURCE_PATH . ':' . VENDOR_PATH . ':' . ROOT . '" 2> ' . $errorLog);
 
             if ($this->content === null)
-            {       
-                throw new \Exception('Error occured compiling '. $source. ' : '. print_r(file('/tmp/output'), true));
+            {
+			//	echo('lessc ' . $this->currentSource . ' --include-path="' . SOURCE_PATH . ':' . VENDOR_PATH . ':' . ROOT . '" 2> ' . $errorLog);
+                throw new \Exception('Error occured compiling '. $source. ' : '. print_r(file($errorLog), true));
             }
         }
         else
