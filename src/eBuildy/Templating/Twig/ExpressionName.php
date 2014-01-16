@@ -26,11 +26,24 @@ class Twig_Node_Expression_Name extends Twig_Node_Expression
     {
         $name = $this->getAttribute('name');
 
-		$compiler
-                ->raw('$context[')
-                ->string($name)
-                ->raw(']')
-            ;
+		$isDefined = $this->getAttribute("is_defined_test");
+		
+		if ($isDefined)
+		{
+			$compiler
+					->raw('isset($context[')
+					->string($name)
+					->raw('])')
+				;	
+		}
+		else
+		{		
+			$compiler
+					->raw('$context[')
+					->string($name)
+					->raw(']')
+				;
+		}
     }
 
     public function isSpecial()
