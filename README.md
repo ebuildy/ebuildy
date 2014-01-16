@@ -20,11 +20,11 @@ Get started
 
 1. Install composer
 
-	curl -sS https://getcomposer.org/installer | php
+	``curl -sS https://getcomposer.org/installer | php``
 
 2. Declare composer dependencies (composer.json file)
 
-	{
+	``{
 		"require": {
 			"ebuildy/ebuildy": "dev-master",
 			"symfony/yaml" : "dev-master",
@@ -32,7 +32,7 @@ Get started
 			"mikejestes/scheezy": "dev-master",
 			"twig/twig" : "v1.14.1",
 		}
-	}
+	}``
 
 
 The bootstrap (index.php)
