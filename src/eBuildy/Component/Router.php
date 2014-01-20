@@ -2,7 +2,6 @@
 
 namespace eBuildy\Component;
 
-use eBuildy\Component\ApplicationAware;
 use eBuildy\Exception\SecurityException;
 use eBuildy\Exception\NotFoundException;
 
@@ -10,9 +9,7 @@ use eBuildy\Exception\NotFoundException;
  * @Service("router", "router")
  */
 class Router
-{
-    use ApplicationAware;
-    
+{    
     public $routes;
     public $securityServiceName;
     

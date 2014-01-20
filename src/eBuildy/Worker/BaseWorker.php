@@ -7,13 +7,11 @@ abstract class BaseWorker
     public $input;
     public $output;
     
-    public $application;
     public $container;
     
-    public function __construct($application)
+    public function __construct($container)
     {
-        $this->application = $application;
-        $this->container = $application->container;
+        $this->container = $container;
         
         $this->initializeErrorHandling();
     }

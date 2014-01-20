@@ -3,15 +3,12 @@
 namespace eBuildy\Asset;
 
 use eBuildy\Asset\AssetResolver;
-use eBuildy\Component\ApplicationAware;
 
 /**
  * @Service('asset', 'asset')
  */
 class AssetHelper
-{
-    use ApplicationAware;
-    
+{    
     /**
      * @Inject("templating")
      */

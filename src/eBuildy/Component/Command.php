@@ -3,9 +3,7 @@
 namespace eBuildy\Component;
 
 abstract class Command
-{
-    use ApplicationAware;
-    
+{    
     /**
      * The main container
      * 
@@ -13,9 +11,9 @@ abstract class Command
      */
     protected $container;
     
-    public function __construct()
+    public function __construct($container)
     {
-        $this->container = $this->getApplication()->container;
+        $this->container = $container;
     }
     
     public function getArgument($index = 0)

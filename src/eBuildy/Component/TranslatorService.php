@@ -1,11 +1,11 @@
 <?php
 
-namespace eBuildy\Helper;
+namespace eBuildy\Component;
 
 /**
  * @Service("translator", "translator")
  */
-class Translator
+class TranslatorService
 {
     protected $catalogues = array();
     

@@ -16,7 +16,7 @@ class WebWorker extends BaseWorker
     {
         $router  = $this->container->getRouterService();        
         
-        $this->application->dispatchEvent(\eBuildy\Component\Application::EVENT_REQUEST_READY, $this->input);
+        //$this->application->dispatchEvent(\eBuildy\Component\Application::EVENT_REQUEST_READY, $this->input);
 
         $this->input->route = $router->matchRequest($this->input);
 
@@ -30,9 +30,7 @@ class WebWorker extends BaseWorker
     }
     
     public function onException(\Exception $e)
-    {  
-	$this->application->onException($e);
-	
+    {  	
         $this->onError($e->getCode(), 'Uncaught exception: ' . $e->getMessage(), $e->getFile(), $e->getLine(), null, $e->getTrace());
     }
 
