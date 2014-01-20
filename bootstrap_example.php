@@ -1,5 +1,4 @@
 <?php
-//$_SERVER['ENV'] = 'prod';
 
 define('DEBUG', isset($_GET['debug']));
 
