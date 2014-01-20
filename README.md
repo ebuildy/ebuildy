@@ -24,7 +24,8 @@ Get started
 
 2. Declare composer dependencies (composer.json file)
 
-	``{
+    ```json
+    {
 		"require": {
 			"ebuildy/ebuildy": "dev-master",
 			"symfony/yaml" : "dev-master",
@@ -32,7 +33,7 @@ Get started
 			"mikejestes/scheezy": "dev-master",
 			"twig/twig" : "v1.14.1",
 		}
-	}``
+    }
 
 
 The bootstrap (index.php)
@@ -40,31 +41,32 @@ The bootstrap (index.php)
 
 Get ready! Create your index.php file like this:
 
-	<?php
+```php
+<?php
 
-	define('DEBUG', true);
+define('DEBUG', true);
 
-	define('ROOT', realpath(__DIR__.DIRECTORY_SEPARATOR.'..') . DIRECTORY_SEPARATOR);
-	define('SOURCE_PATH', ROOT.'src/');
-	define('VENDOR_PATH', ROOT.'vendor/');
-	define('CONFIG_PATH', ROOT.'config/');
-	define('TMP_PATH', ROOT . 'tmp/');
-	define('WEB_PATH', ROOT.'web/');
+define('ROOT', realpath(__DIR__.DIRECTORY_SEPARATOR.'..') . DIRECTORY_SEPARATOR);
+define('SOURCE_PATH', ROOT.'src/');
+define('VENDOR_PATH', ROOT.'vendor/');
+define('CONFIG_PATH', ROOT.'config/');
+define('TMP_PATH', ROOT . 'tmp/');
+define('WEB_PATH', ROOT.'web/');
 
-	putenv('PATH=' . getenv('PATH') . ':/usr/local/bin:/usr/bin');
-	
-	header('Content-type: text/html; charset=UTF-8');
+putenv('PATH=' . getenv('PATH') . ':/usr/local/bin:/usr/bin');
 
-	include(VENDOR_PATH . 'autoload.php');
-	include(SOURCE_PATH . 'MyApplication.php');
+header('Content-type: text/html; charset=UTF-8');
 
-	$application = new MyApplication('production');
+include(VENDOR_PATH . 'autoload.php');
+include(SOURCE_PATH . 'MyApplication.php');
 
-	$application->run();
+$application = new MyApplication('production');
 
-	function debug($name, $value = null)
-	{
-		global $application;
+$application->run();
 
-		$application->container->getEbuildyDebugService()->log($name, $value);
-	}
+function debug($name, $value = null)
+{
+	global $application;
+
+	$application->container->getEbuildyDebugService()->log($name, $value);
+}
