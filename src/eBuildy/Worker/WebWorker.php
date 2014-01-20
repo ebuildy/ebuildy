@@ -14,10 +14,10 @@ class WebWorker extends BaseWorker
     
     public function run()
     {
-        $router  = $this->container->getRouterService();        
+        $router  = $this->container->getRouterService();
+		
+		$this->container->getHookService()->dispatch('ebuildy.request.ready', $this->input);
         
-        //$this->application->dispatchEvent(\eBuildy\Component\Application::EVENT_REQUEST_READY, $this->input);
-
         $this->input->route = $router->matchRequest($this->input);
 
         $controllerClass = $this->input->route['controller'];

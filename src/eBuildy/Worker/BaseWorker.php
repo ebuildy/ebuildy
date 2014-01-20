@@ -7,6 +7,9 @@ abstract class BaseWorker
     public $input;
     public $output;
     
+	/**
+	 * @var \Container 
+	 */
     public $container;
     
     public function __construct($container)

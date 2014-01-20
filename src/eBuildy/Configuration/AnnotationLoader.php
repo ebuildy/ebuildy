@@ -7,7 +7,7 @@ class AnnotationLoader
     private $sourceDir;
     private $routes = array();
     private $services = array();
-    private $eventListeners = array();
+    private $hooks = array();
     private $commands = array();
     private $exposes = array();
     
@@ -25,7 +25,14 @@ class AnnotationLoader
 
         $this->extractModule($path);
         
-        return array('parameters' => array('router' => array('routes' => $this->routes), 'templating' => array('exposes' => $this->exposes)), 'services' => $this->services, 'commands' => $this->commands, 'event_listeners' => $this->eventListeners);
+        return array('parameters' => array(
+			'router'		=> array(
+			'routes'		=> $this->routes), 
+			'templating'	=> array('exposes' => $this->exposes), 
+			'command'		=> array('commands' => $this->commands), 
+			'hook'			=> array('hooks' => $this->hooks)
+		), 
+		'services' => $this->services);
     }
 
     protected function extractModule($module)
@@ -225,16 +232,16 @@ class AnnotationLoader
         $this->exposes[$name]  = array( 'service' => $this->currentService, 'method' => $this->currentMethod);
     }
     
-    protected function Event($event, $priority = 0)
+    protected function Hook($name, $priority = 0)
     {
         if ($this->currentService !== null)
         {
-            if (!isset($this->eventListeners[$event]))
+            if (!isset($this->hooks[$name]))
             {
-                $this->eventListeners[$event] = array();
+                $this->hooks[$name] = array();
             }
 
-            $this->eventListeners[$event] []= array('priority' => $priority, 'service' => $this->currentService, 'method' => $this->currentMethod);
+            $this->hooks[$name] []= array('priority' => $priority, 'service' => $this->currentService, 'method' => $this->currentMethod);
         }
     }
 }

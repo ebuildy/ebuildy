@@ -131,11 +131,7 @@ class ContainerBuilder
     public function build($dir, $name)
     {
         $phpContent = '<?php ' . PHP_EOL . PHP_EOL . 'class ' . $name . ' extends \eBuildy\Container\BaseContainer {' . PHP_EOL . PHP_EOL;
-        
-        $phpContent .= 'public $commands = ' . var_export($this->configuration['commands'], true) . ';' . PHP_EOL;        
-        
-        $phpContent .= 'public $eventListeners = ' . var_export($this->configuration['event_listeners'], true) . ';' . PHP_EOL;        
-        
+            
        // $frameworkDebug = $this->configuration['parameters']['ebuildy']['debug'];
         
         $services   = $this->get('services');
@@ -145,15 +141,6 @@ class ContainerBuilder
             $phpContent .= 'protected $' . $this->resolveServicePropertyName($serviceName) . ' = null;' . PHP_EOL;
         }
         
-        $phpContent .= PHP_EOL;
-        
-        foreach ($this->get('parameters') as $parameterName => $parameter)
-        {            
-           // $parameter['debug'] = $frameworkDebug;
-
-            $phpContent .= 'protected $__config_' . $parameterName . ' =  ' . var_export($parameter, true) . ';' . PHP_EOL;
-        }
-
         $phpContent .= PHP_EOL . PHP_EOL;
 
         foreach ($this->get('parameters') as $parameterName => $parameter)
@@ -162,7 +149,7 @@ class ContainerBuilder
 
             $phpContent .= 'public function ' . $method . '() {' . PHP_EOL;
 
-            $phpContent .= "\t" . 'return $this->__config_' . $parameterName . ';' . PHP_EOL;
+            $phpContent .= "\t" . 'return ' . var_export($parameter, true) . ';' . PHP_EOL;
 
             $phpContent .= '}' . PHP_EOL . PHP_EOL;
         }
