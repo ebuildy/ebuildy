@@ -7,7 +7,7 @@ Features
 - Simple and complete framework
 - [Dependency Injection container](https://github.com/ebuildy/ebuildy/wiki/Container-builder)
 - [PHP Annotations parser for Routing, Dependency Injection..](https://github.com/ebuildy/ebuildy/wiki/Annotation-parser)
-- Asset management with assets groups
+- [Asset management with assets groups](https://github.com/ebuildy/ebuildy/wiki/Asset-management)
 - Templating with native PHP and/or Twig
 - Input validators and form generator
 - Simple console component
