@@ -49,7 +49,7 @@ class TwigCompiler extends Compiler
 		$env->registerUndefinedFunctionCallback(array($this, "undefinedFunctionCallback"));
 		
         $env->addGlobal('__template_name', basename($this->templatePath));
-                
+
         foreach($this->exposedMethod as $methodName => $method)
         {
             if (isset($method['service']))

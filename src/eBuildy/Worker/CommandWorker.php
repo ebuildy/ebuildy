@@ -8,8 +8,10 @@ class CommandWorker extends BaseWorker
     
     public function initialize($parameters)
     {
+		$buffer = $this->container->getCommandConfiguration();
+		
         $this->parameters = $parameters;
-        $this->commands = $this->container->commands;
+        $this->commands = $buffer['commands'];
     }
     
     protected function runAutoCompletion()
@@ -83,7 +85,7 @@ class CommandWorker extends BaseWorker
         
         $command = $this->commands[$commandInput];
 
-        $commandInstance = new $command($commandInput);
+        $commandInstance = new $command($this->container);
                 
         return $commandInstance->run(new \Symfony\Component\Console\Input\ArgvInput($argv), $output);
     }

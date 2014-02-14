@@ -7,40 +7,25 @@ use eBuildy\Asset\AssetResolver;
 /**
  * @Service('asset', 'asset')
  */
-class AssetHelper
+class AssetService
 {    
     /**
      * @Inject("templating")
      */
     public $templatingService;
 
-    /**
-     * Configuration("path_css")
-     */
     public $cssPath = '/dev/css/';
-    
-    /**
-     * Configuration('path_js")
-     */
+
     public $jsPath  = '/dev/css/';
-    
-    /**
-     * Configuration("compress")
-     */
+
     public $compress = false;
-    
-    /**
-     * Configuration("version")
-     */
+
     public $version = 4;
     
     public $groups;
     
     public $expandGroups = false;
     
-   /**
-     * Configuration("version_format")
-     */
     public $versionFormat = 4;
     
     public $enableCompilation = false;
@@ -93,7 +78,7 @@ class AssetHelper
         $listItems = $this->templatingService->variables->get('assets_css', array());
         
         $listItems []= $target;
-        
+
         $this->templatingService->variables->set('assets_css', $listItems);
     }
 
@@ -135,21 +120,30 @@ class AssetHelper
     
     private function getGroupAssetPath($type, $sources)
     {
-        $sourcePath = array();
-        
+        $sourcePaths = array();
+
         foreach($sources as $source)
         {
-            if ($this->isGroup($source))
+			if ($this->isGroup($source))
             {
-                $sourcePath = array_merge($sourcePath, $this->getGroupAssetPath($type, $this->groups[$type][$source]));
+                $sourcePaths = array_merge($sourcePaths, $this->getGroupAssetPath($type, $this->groups[$type][$source]));
+            }
+            elseif ($this->isFolder($source))
+            {
+				$folderPath = $this->getAssetPath($source);
+
+				foreach(glob($folderPath) as $folderFile)
+				{
+					$sourcePaths []= $folderFile;
+				}
             }
             else
             {
-                $sourcePath []= $this->getAssetPath($source);
+                $sourcePaths []= $this->getAssetPath($source);
             }
         }
-        
-        return $sourcePath;
+       // var_dump($sourcePaths);
+        return $sourcePaths;
     }
     
     public function compile($type, $source, $options = array(), $force = false)
@@ -181,7 +175,7 @@ class AssetHelper
             {
                 $sourcePath = $this->getAssetPath($source);
             }
-            
+			
             $targetFilePath     = WEB_PATH . AssetResolver::resolveNameForCompilation($targetUri);
         
             if ($force || $this->forceCompilation)
@@ -241,6 +235,11 @@ class AssetHelper
     
     private function isGroup($name)
     {
-        return !strpos($name, '.');
+        return !strpos($name, '.') && !strpos($name, '/');
     }
+	
+	private function isFolder($name)
+	{
+		return !strpos($name, '.');
+	}
 }

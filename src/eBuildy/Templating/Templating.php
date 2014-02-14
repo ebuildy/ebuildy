@@ -24,6 +24,11 @@ class Templating
         }
     }
     
+	public function getVariable($name)
+	{
+		return $this->variables->get($name);
+	}
+	
     public function addVariable($name, $value)
     {
         $this->variables->set($name, $value);

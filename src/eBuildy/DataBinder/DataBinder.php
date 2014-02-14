@@ -20,7 +20,7 @@ abstract class DataBinder
         $this->name = $name;
         $this->options = $options;
         
-        $defaultPreTransforms = array('trim', 'eBuildy\DataBinder\DataBinderHelper::my_htmlentities');
+        $defaultPreTransforms = array('trim');
 
         if (isset($options['pre_transforms']))
         {

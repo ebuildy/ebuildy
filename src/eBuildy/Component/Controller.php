@@ -56,7 +56,7 @@ class Controller extends ContainerAware
     protected function getInput($value, $label = '', $transformers = null, $validators = null)
     {
         $value = $this->request->get($value);
-        
+
         if ($transformers !== null && $validators !== null)
         {
             $value = \eBuildy\DataBinder\DataBinderHelper::get($value, $label, $transformers, $validators);
@@ -117,7 +117,7 @@ class Controller extends ContainerAware
      * @return RedirectResponse
      */
     public function redirect($url, $status = 302)
-    {
+    {		
         $this->redirectWithHtml($url);
         
         $this->response->addHeader('location', $url);

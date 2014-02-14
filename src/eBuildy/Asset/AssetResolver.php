@@ -37,7 +37,7 @@ class AssetResolver
             }
         }
         
-        return $path === null ? null : realpath($path);
+        return $path;
     }
             
     static public  function resolveRouteData($source, $target)
