@@ -13,11 +13,17 @@ class Router
     public $routes;
     public $securityServiceName;
     
-    private $request;     
+    private $request;
+    private $absoluteUri;
     
     public function initialize($configuration)
     {
         $this->routes = $configuration['routes'];
+        
+        if (isset($configuration['absolute_uri']))
+        {
+            $this->absoluteUri = $configuration['absolute_uri'];
+        }
     }
     
     public function matchRequest($request)
@@ -43,7 +49,7 @@ class Router
      */
     public function generate($name, $parameters = array(), $absolute = false)
     {
-        return ($absolute ? "http://www.kinoulink.com" : "") . $this->bindRoute($this->routes[$name], $parameters);
+        return ($absolute ? "//" . $this->absoluteUri : "") . $this->bindRoute($this->routes[$name], $parameters);
     }
     
     public function get($name)

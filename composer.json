@@ -2,7 +2,7 @@
   "name": "ebuildy/ebuildy",
   "type":"library",
   "description": "PHP MVC Framework",
-  "keywords": ["mvc","framework","php","annotations","ioc"],
+  "keywords": ["mvc","framework","php","annotations","ioc", "asset", "hook"],
   "homepage": "http://github.com/ebuildy/ebuildy",
   "license": "MIT",
   "authors": [
@@ -13,9 +13,10 @@
     }
   ],
   "require": {
-    "php": ">=5.4.0",
+    "php": ">=5.4.0"
+  },
+  "suggest" : {
     "symfony/yaml" : "dev-master",
-    "symfony/console" : "dev-master",
     "mikejestes/scheezy": "dev-master"
   },
   "autoload": {
