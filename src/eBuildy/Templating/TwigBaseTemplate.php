@@ -38,6 +38,23 @@ class TwigBaseTemplate  implements \Twig_TemplateInterface
     {
         echo $this->block($name);
     }
+	
+	/**
+     * Renders a block.
+     *
+     * This method is for internal use only and should never be called
+     * directly.
+     *
+     * @param string $name    The block name to render
+     * @param array  $context The context
+     * @param array  $blocks  The current set of blocks
+     *
+     * @return string The rendered block
+     */
+    public function renderBlock($name, array $context, array $blocks = array())
+    {
+        return $this->block($name);
+    }
         
     protected function getAttribute($object, $item, array $arguments = array(), $type = \Twig_TemplateInterface::ANY_CALL, $isDefinedTest = false, $ignoreStrictCheck = false)
     {
