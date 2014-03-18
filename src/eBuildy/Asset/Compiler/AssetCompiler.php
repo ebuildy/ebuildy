@@ -13,7 +13,9 @@ abstract class AssetCompiler
     
     public function __construct($options = null)
     {
-        $this->options = $options;
+        $this->options = array_merge(array(
+			'compile' => true
+		), $options);
     }
     
     /**

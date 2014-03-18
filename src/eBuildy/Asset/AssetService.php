@@ -88,7 +88,7 @@ class AssetService
     public function js($source, $options = array())
     {
         $target = $this->compile('js', $source, $options);
-                
+
         return '<script src="' . $target . '"></script>';
     }
     
@@ -105,6 +105,30 @@ class AssetService
         
         $this->templatingService->variables->set('assets_js', $listItems);
     }
+	
+	/**
+	 * @Expose("addInlineJS")
+	 */
+	public function addInlineJS($content)
+	{
+		$buffer = $this->templatingService->variables->get('inline_js', '');
+        
+        $buffer .= $content;
+        
+        $this->templatingService->variables->set('inline_js', $buffer);
+	}
+	
+	/**
+	 * @Expose("addInlineCSS")
+	 */
+	public function addInlineCSS($content)
+	{
+		$buffer = $this->templatingService->variables->get('inline_css', '');
+        
+        $buffer .= $content;
+        
+        $this->templatingService->variables->set('inline_css', $buffer);
+	}
     
     public function getAssetPath($source)
     {

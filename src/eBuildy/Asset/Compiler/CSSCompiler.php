@@ -30,13 +30,28 @@ class CSSCompiler extends AssetCompiler
                 throw new \Exception('Error occured compiling '. $source. ' : '. print_r(file($errorLog), true));
             }
         }
-        else
+		elseif (strpos($source, '.scss') !== false)
         {
-//            $this->content = file_get_contents($source);
-//
-//            copy($source, $target);
-                $this->content = $this->compileFile($source);
+			$errorLog = TMP_PATH . 'css_compiler_error.log';
+			
+            $this->currentSource = $this->resolveFilePath($source);
+
+            $this->content = shell_exec('sass ' . $this->currentSource . ' 2> ' . $errorLog);
+
+            if ($this->content === null)
+            {
+			//	echo('lessc ' . $this->currentSource . ' --include-path="' . SOURCE_PATH . ':' . VENDOR_PATH . ':' . ROOT . '" 2> ' . $errorLog);
+                throw new \Exception('Error occured compiling '. $source. ' : '. print_r(file($errorLog), true));
+            }
         }
+        elseif ($this->options['compile'])
+        {
+			$this->content = $this->compileFile($source);
+        }
+		else
+		{
+			$this->content = file_get_contents($source);
+		}
 
         //var_dump();
 

@@ -7,6 +7,7 @@ class Response
     protected $rawContent;
     protected $headers = array();
     protected $cookies = array();
+	protected $status = 200;
     
     public function __construct($content = '', $headers = array())
     {
@@ -18,6 +19,11 @@ class Response
     {
         $this->headers[$name] = $value;
     }
+	
+	public function setStatus($status)
+	{
+		$this->status = $status;
+	}
     
     public function setCookie($name, $value, $expire = 0, $path = '/', $domain = null, $secure = false, $httponly = false)
     {
@@ -57,9 +63,11 @@ class Response
     {
         if ($display)
         {
+			http_response_code($this->status);
+			
             foreach($this->headers as $name => $value)
             {
-                header($name.': '.$value);
+                header($name.': '.$value);		
             }
 
             foreach($this->cookies as $name => $cookie)

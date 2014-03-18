@@ -8,21 +8,21 @@ use eBuildy\Exception\NotFoundException;
 /**
  * @Service("router", "router")
  */
-class Router
+class RouterService
 {    
     public $routes;
     public $securityServiceName;
     
     private $request;
-    private $absoluteUri;
+    private $baseUris;
     
     public function initialize($configuration)
     {
         $this->routes = $configuration['routes'];
         
-        if (isset($configuration['absolute_uri']))
+        if (isset($configuration['base_uris']))
         {
-            $this->absoluteUri = $configuration['absolute_uri'];
+            $this->baseUris = $configuration['base_uris'];
         }
     }
     
@@ -47,9 +47,14 @@ class Router
     /**
      * @Expose("getUrl")
      */
-    public function generate($name, $parameters = array(), $absolute = false)
+    public function generate($name, $parameters = array(), $base = false)
     {
-        return ($absolute ? "//" . $this->absoluteUri : "") . $this->bindRoute($this->routes[$name], $parameters);
+		if ($base === true)
+		{
+			$base = 'default';
+		}
+		
+        return ($base !== false ? $this->baseUris[$base] : "") . $this->bindRoute($this->routes[$name], $parameters);
     }
     
     public function get($name)

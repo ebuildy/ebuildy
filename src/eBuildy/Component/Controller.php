@@ -128,7 +128,23 @@ class Controller extends ContainerAware
     protected function renderJSON($data)
     {
         $buffer = json_encode($data);
-        
+		
+		if ($buffer === false)
+		{
+			$errors = array(
+				JSON_ERROR_NONE =>  'Aucune erreur',
+				JSON_ERROR_DEPTH => 'Profondeur maximale atteinte',
+				JSON_ERROR_STATE_MISMATCH => 'Inadéquation des modes ou underflow',
+				JSON_ERROR_CTRL_CHAR => 'Erreur lors du contrôle des caractères',
+				JSON_ERROR_SYNTAX => 'Erreur de syntaxe ; JSON malformé',
+				JSON_ERROR_UTF8 => 'Caractères UTF-8 malformés, probablement une erreur d\'encodage'
+			);
+			
+			$errorMessage = isset($errors[json_last_error()]) ? $errors[json_last_error()] : 'Erreur inconnue';
+				
+			throw new \Exception("Cannot JSON encode data: " . $errorMessage, 500);
+		}
+		
         $this->response->setContent($buffer);
         
         $this->response->addHeader('Content-Length', mb_strlen($buffer));
