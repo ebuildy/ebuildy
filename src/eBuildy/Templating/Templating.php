@@ -12,6 +12,13 @@ class Templating {
 	public $currentCompiler;
 	public $variables;
 	private $stackCompilers = array();
+	
+	
+	/**
+	 * Map of file extension ==> engine.
+	 * @var array
+	 */
+	private $engines;
 
 	public function initialize($configuration)
 	{
@@ -20,6 +27,8 @@ class Templating {
 			$this->exposeMethods = $configuration['exposes'];
 			$this->variables = new \eBuildy\Helper\ParameterBag();
 		}
+		
+		$this->engines = $configuration['engine'];
 	}
 
 	public function getVariable($name)
@@ -95,14 +104,13 @@ class Templating {
 
 	protected function getCompiler($templateName)
 	{
-		if (strpos($templateName, '.twig') !== false)
-		{
-			return new TwigCompiler($this->container, $this->exposeMethods);
-		}
-		else
-		{
-			return new Compiler($this->container, $this->exposeMethods);
-		}
+		$buffer = strpos($templateName, '.');
+
+		$templateExtension = substr($templateName, $buffer + 1);
+		
+		$engineClass = $this->engines[$templateExtension];
+		
+		return new $engineClass($this->container, $this->exposeMethods);
 	}
 
 }
