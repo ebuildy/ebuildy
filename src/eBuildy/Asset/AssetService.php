@@ -129,6 +129,25 @@ class AssetService
         
         $this->templatingService->variables->set('inline_css', $buffer);
 	}
+	
+	/**
+	 * @Expose("insertInlineJS")
+	 */
+	public function insertInlineJS($resource, $append = true)
+	{
+		$path = $this->getAssetPath($resource);
+		
+		$content = file_get_contents($path);
+		
+		if ($append)
+		{
+			$this->addInlineJS($content);
+		}
+		else
+		{
+			return '<script>' . $content . '</script>';
+		}
+	}
     
     public function getAssetPath($source)
     {
