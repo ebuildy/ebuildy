@@ -6,7 +6,14 @@ use eBuildy\Container\ContainerAware;
 
 class Controller extends ContainerAware
 {
+	/**
+	 * @var Request
+	 */
     protected $request;
+	
+	/**
+	 * @var Response
+	 */
     protected $response;
                 
     public function execute($request, $response)
