@@ -17,6 +17,11 @@ abstract class Validator
     {
         $this->options = array_merge($this->options, $options);
     }
+	
+	public function __invoke($value)
+	{
+		return $this->validate($value);
+	}
     
    abstract public function validate($value);  
 }

@@ -9,7 +9,7 @@ class DataBinderHelper
     static public function get($value, $label = '', $preTransforms = array(), $validators = array())
     {
         $control = new FormControl($label, $label, array('pre_transforms' => $preTransforms, 'validators' => $validators));
-        
+
         if ($control->bind($value))
         {
             return $control->getDataNormed();

@@ -174,12 +174,19 @@ abstract class DataBinder
     {
         if (!is_array($validators))
         {
-            $validators = array($validators);
+            $res = $validators($this->getData());
+
+            if ($res !== true)
+            {
+                $this->errors[] = $res;
+
+                return false;
+            }
         }
 	
         foreach($validators as $validator)
         {
-            $res = $validator->validate($this->getData());
+            $res = $validator($this->getData());
 
             if ($res !== true)
             {
