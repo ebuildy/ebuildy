@@ -64,7 +64,7 @@ class Controller extends ContainerAware
     {
         $value = $this->request->get($value);
 
-        if ($transformers !== null && $validators !== null)
+        if (!empty($transformers) && !empty($validators))
         {
             $value = \eBuildy\DataBinder\DataBinderHelper::get($value, $label, $transformers, $validators);
         }
