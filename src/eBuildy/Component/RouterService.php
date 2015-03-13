@@ -9,8 +9,16 @@ use eBuildy\Exception\NotFoundException;
  * @Service("router", "router")
  */
 class RouterService
-{    
-    public $routes;
+{
+    /**
+     * @var Container
+     */
+    public $container;
+
+    /**
+     * @var array
+     */
+    public $controllers;
     public $securityServiceName;
     
     private $request;
@@ -18,36 +26,54 @@ class RouterService
     
     public function initialize($configuration)
     {
-        $this->routes = $configuration['routes'];
+        $this->controllers = $configuration['controllers'];
         
         if (isset($configuration['base_uris']))
         {
             $this->baseUris = $configuration['base_uris'];
         }
     }
-    
+
+
+    /**
+     * @param Request $request
+     * @return mixed
+     *
+     * @throws \eBuildy\Exception\NotFoundException
+     * @throws \eBuildy\Exception\SecurityException
+     */
     public function matchRequest($request)
     {
-        $uri = $request->getPathInfo();
+        $uri    = $request->getPathInfo();
         $method = $request->getMethod();
         
         $this->request = $request;
         
-        foreach($this->routes as $route)
+        foreach($this->controllers as $controller)
         {
-            if ($this->matchRoute($route, $method, $uri) && $this->secureRoute($route))
-            {                
-                return $this->prepare($route);
+            $controllerPrefix = $controller['prefix'];
+
+            if (empty($controllerPrefix) || strpos($uri, $controllerPrefix) === 0)
+            {
+                $subURI = substr($uri, strlen($controllerPrefix));
+
+                foreach ($controller['routes'] as $route)
+                {
+                    if ($this->matchRoute($route, $method, $subURI) && $this->secureRoute($route))
+                    {
+                        return $this->prepare($controller, $route);
+                    }
+                }
             }
         }
         
-        throw new NotFoundException('route', array('method' => $method, 'uri' =>$uri));
+        throw new NotFoundException('route', ['method' => $method, 'uri' =>$uri]);
     }
     
     /**
      * @Expose("getUrl")
      */
-    public function generate($name, $parameters = array(), $base = false)
+    public function generate($name, $parameters = [], $base = false)
     {
 		if ($base === true)
 		{
@@ -74,13 +100,13 @@ class RouterService
         
         return true;
     }
-    
+
     protected function matchRoute(&$route, $method, $uri)
     {
-        $routeMethod = $route['method'];
-       
-        if ($routeMethod === '' || $routeMethod === $method)
-        {        
+        $routeMethod = isset($route['method']) ? $route['method'] : null;
+
+        if (empty($routeMethod) || $routeMethod === $method)
+        {
             if (isset($route['path']))
             {
                 return $uri === $route['path'];
@@ -91,40 +117,25 @@ class RouterService
 
                 if ($res !== false && $res != 0)
                 {//ob_clean();var_dump($matches);die();
-                
+
                     foreach($matches as $key => $value)
-                    {                    
+                    {
                         $this->request->routeData->set($key, $value[0]);
                     }
-                    
+
                     return true;
                 }
             }
         }
     }
-    
-    protected function prepare($route)
+
+    protected function prepare($controller, $route)
     {
-        $controller = $route['controller'];
-        $buffer = explode('\\', $controller);
+        $controllerInstance = $this->container->get('controller.' . $controller['name']);
 
-        $module = '';
+        $route['controller'] = $controllerInstance;
 
-           foreach($buffer as $part)
-           {
-               if ($part !== 'Controller')
-               {
-                   $module .= $part.DIRECTORY_SEPARATOR;
-               }
-               else
-               {
-                   break;
-               }
-           }
-
-       $route['module'] = $module;
-       
-       return $route;
+        return $route;
     }
     
     protected function bindRoute($route, $parameters = null)
