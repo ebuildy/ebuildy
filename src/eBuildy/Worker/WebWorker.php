@@ -20,17 +20,15 @@ class WebWorker extends BaseWorker
         
         $this->input->route = $router->matchRequest($this->input);
 
-        $controllerClass = $this->input->route['controller'];
-        
-        $controller= new $controllerClass($this->container);
+        $controllerInstance = $this->input->route['controller'];
 
-        $controller->execute($this->input, $this->output);
+        $controllerInstance->execute($this->input, $this->output);
 
         return $this->output->render();
     }
     
     public function onException(\Exception $e)
-    {  	
+    {
         $this->onError($e->getCode(), 'Uncaught exception: ' . $e->getMessage(), $e->getFile(), $e->getLine(), null, $e->getTrace());
     }
 
