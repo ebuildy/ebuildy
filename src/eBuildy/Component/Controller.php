@@ -2,9 +2,7 @@
 
 namespace eBuildy\Component;
 
-use eBuildy\Container\ContainerAware;
-
-class Controller extends ContainerAware
+class Controller
 {
 	/**
 	 * @var Request
