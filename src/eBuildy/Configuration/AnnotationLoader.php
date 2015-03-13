@@ -139,6 +139,16 @@ class AnnotationLoader
             'routes' => [],
             'prefix' => $pattern
         ];
+
+        $controllerService = 'controller.' . $name;
+
+        $this->currentService = $controllerService;
+
+        $this->services[$controllerService] = [
+            'class'             => $this->currentClass,
+            'configurationNode' => null,
+            'dependencies'      => []
+        ];
     }
 
     protected function Route($pattern, $name = null, $method = "")
