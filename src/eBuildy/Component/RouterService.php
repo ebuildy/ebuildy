@@ -51,11 +51,18 @@ class RouterService
         
         foreach($this->controllers as $controller)
         {
-            foreach($controller['routes'] as $route)
+            $controllerPrefix = $controller['prefix'];
+
+            if (empty($controllerPrefix) || strpos($uri, $controllerPrefix) === 0)
             {
-                if ($this->matchRoute($route, $method, $uri) && $this->secureRoute($route))
+                $subURI = substr($uri, strlen($controllerPrefix));
+
+                foreach ($controller['routes'] as $route)
                 {
-                    return $this->prepare($controller, $route);
+                    if ($this->matchRoute($route, $method, $subURI) && $this->secureRoute($route))
+                    {
+                        return $this->prepare($controller, $route);
+                    }
                 }
             }
         }
