@@ -70,20 +70,7 @@ class Controller
         return $value;
     }
     
-     /**
-     * Generates a URL from the given parameters.
-     *
-     * @param string  $route      The name of the route
-     * @param mixed   $parameters An array of parameters
-	 * @param boolean $absolute 
-     *
-     * @return string The generated URL
-     */
-    public function generateUrl($route, $parameters = array(), $absolute = false)
-    {
-        return $this->get('router')->generate($route, $parameters, $absolute);
-    }
-    
+
     /**
      * Returns a RedirectResponse to the given URL.
      *
@@ -155,22 +142,5 @@ class Controller
         $this->response->addHeader('Content-Length', mb_strlen($buffer));
         
         return $this->response;
-    }
-
-    protected function renderDecoratedTemplate($templates, $data = array())
-    {
-        foreach($templates as &$template)
-        {
-            $template = \eBuildy\Helper\ResolverHelper::resolveTemplatePath($template, $this->request->route['module'], $this->request->route['controller']);
-        }
-        
-        $this->response->setContent($this->get('templating')->renderDecoratedTemplate($templates, $data));
-        
-        return $this->response;
-    }
-        
-    protected function renderTemplate($template, $data = array())
-    {
-        return $this->renderDecoratedTemplate(array($template), $data);
     }
 }
