@@ -60,7 +60,16 @@ class RouterService
 
             if (empty($controllerPrefix) || strpos($uri, $controllerPrefix) === 0)
             {
-                $subURI = substr($uri, strlen($controllerPrefix));
+                $prefixLength = strlen($controllerPrefix);
+
+                if ($prefixLength > 1)
+                {
+                    $subURI = substr($uri, $prefixLength);
+                }
+                else
+                {
+                    $subURI = $uri;
+                }
 
                 foreach ($controller['routes'] as $route)
                 {
