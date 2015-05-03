@@ -57,6 +57,11 @@ class Controller
         
     }
     
+    protected function getRequestData($name)
+    {
+	return new \eBuildy\DataBinder\DataBinderWorkflow($name, $this->request->get($name));
+    }
+    
     
     protected function getInput($value, $label = '', $transformers = null, $validators = null)
     {
