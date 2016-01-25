@@ -28,7 +28,7 @@ abstract class BaseWorker
     
     abstract public function run();
     
-    abstract public function onException(\Exception $e);
+    abstract public function onException(\Throwable $e);
 
     abstract public function onError($errno, $errstr, $errfile, $errline, $errcontext);
 }
