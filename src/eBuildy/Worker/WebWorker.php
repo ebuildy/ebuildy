@@ -27,7 +27,7 @@ class WebWorker extends BaseWorker
         return $this->output->render();
     }
     
-    public function onException(\Exception $e)
+    public function onException(\Throwable $e)
     {
         $this->onError($e->getCode(), 'Uncaught exception: ' . $e->getMessage(), $e->getFile(), $e->getLine(), null, $e->getTrace());
     }
