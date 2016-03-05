@@ -90,7 +90,7 @@ class CommandWorker extends BaseWorker
         return $commandInstance->run(new \Symfony\Component\Console\Input\ArgvInput($argv), $output);
     }
     
-    public function onException(\Exception $e)
+    public function onException(\Throwable $e)
     {
         $title = $e->getMessage();
         $code = $e->getCode();
