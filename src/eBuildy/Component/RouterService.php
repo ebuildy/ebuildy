@@ -94,12 +94,12 @@ class RouterService
 			$base = 'default';
 		}
 		
-        return ($base !== false ? $this->baseUris[$base] : "") . $this->bindRoute($this->routes[$name], $parameters);
+        return ($base !== false ? $this->baseUris[$base] : "") . $this->bindRoute($this->controllers[$name], $parameters);
     }
     
     public function get($name)
     {
-        return $this->routes[$name];
+        return $this->controllers[$name];
     }
     
     protected function secureRoute($route)
