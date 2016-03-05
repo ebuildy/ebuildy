@@ -94,7 +94,15 @@ class RouterService
 			$base = 'default';
 		}
 		
-        return ($base !== false ? $this->baseUris[$base] : "") . $this->bindRoute($this->controllers[$name], $parameters);
+        foreach($this->controllers as $controllerName => $controller)
+        {
+            if (isset($controller['routes'][$name]))
+            {
+                return ($base !== false ? $this->baseUris[$base] : "") . $this->bindRoute($controller['routes'][$name], $parameters);
+            }
+        }
+
+        throw new NotFoundException('Route ' . $name . ' not found!');
     }
     
     public function get($name)
