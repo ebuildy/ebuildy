@@ -47,7 +47,7 @@ class RouterService
         $uri    = $request->getPathInfo();
         $method = $request->getMethod();
         
-        if (strlen($uri) > 1 && $uri[0] === '/' && $uri[1] === '/')
+        while (strlen($uri) > 1 && $uri[0] === '/' && $uri[1] === '/')
         {
             $uri = substr($uri, 1);
         }
