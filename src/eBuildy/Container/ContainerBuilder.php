@@ -36,6 +36,8 @@ class ContainerBuilder
                 $this->__addNode($this->configuration, $name, $data);
             }
         }
+        
+        return $this;
     }
 
     private function __addNode(&$node, $name, $data)
