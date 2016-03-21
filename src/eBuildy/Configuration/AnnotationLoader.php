@@ -17,6 +17,7 @@ class AnnotationLoader
     private $currentProperty;
     private $currentSecurity;
     private $currentController;
+    private $currentPrefix;
 
     public function load($path, $contextAutoLoad = null)
     {
@@ -70,6 +71,11 @@ class AnnotationLoader
                 {
                     eval('$this->' . $annotation . ';');
                 }
+            }
+
+            if ($r->isSubclassOf('eBuildy\Container\ContainerAware'))
+            {
+                $this->services[$this->currentService]['containerAware'] = true;
             }
 
             $methods = $r->getMethods(\ReflectionMethod::IS_PUBLIC);
