@@ -165,6 +165,13 @@ class ContainerBuilder
                 var_dump($serviceName, $service);
                 die('error configuration.php');
             }
+
+            $args = '';
+
+            if (isset($service['containerAware']))
+            {
+                $args .= '$this';
+            }
             
             $phpContent .= '/**' . PHP_EOL . '* @public' . PHP_EOL . '* @return ' . $service['class'] . PHP_EOL . '*/' . PHP_EOL;
 
@@ -172,9 +179,7 @@ class ContainerBuilder
 
             $phpContent .= "\t" . 'if ($this->' . $this->resolveServicePropertyName($serviceName) . ' === null) {' . PHP_EOL;
 
-            $phpContent .= "\t\t" . '$this->' . $this->resolveServicePropertyName($serviceName) . ' = new ' . $service['class'] . '();' . PHP_EOL;
-
-            $phpContent .= "\t\t" . '$this->' . $this->resolveServicePropertyName($serviceName) . '->container = $this;' . PHP_EOL;
+            $phpContent .= "\t\t" . '$this->' . $this->resolveServicePropertyName($serviceName) . ' = new ' . $service['class'] . '(' . $args . ');' . PHP_EOL;
 
             if (isset($service['configurationNode']))
             {
