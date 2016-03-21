@@ -1,6 +1,6 @@
 <?php
 
-namespace eBuildy\Configuration;
+namespace eBuildy\Container;
 
 class AnnotationLoader
 {
