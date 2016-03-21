@@ -3,7 +3,6 @@
 namespace eBuildy\Container;
 
 use eBuildy\Component\Cache;
-use eBuildy\Configuration\AnnotationLoader;
 use eBuildy\Helper\ResolverHelper;
 use Symfony\Component\Yaml\Yaml;
 
