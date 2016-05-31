@@ -2,6 +2,7 @@
 
 namespace eBuildy\Component;
 
+use eBuildy\Container\ContainerAwareTrait;
 use eBuildy\Exception\SecurityException;
 use eBuildy\Exception\NotFoundException;
 
@@ -10,10 +11,7 @@ use eBuildy\Exception\NotFoundException;
  */
 class RouterService
 {
-    /**
-     * @var Container
-     */
-    public $container;
+    use ContainerAwareTrait;
 
     /**
      * @var array
