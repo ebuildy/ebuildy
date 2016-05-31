@@ -161,8 +161,7 @@ class ContainerBuilder
             
             if (!isset($service['class']))
             {
-                var_dump($serviceName, $service);
-                die('error configuration.php');
+                continue;
             }
 
             $args = '';
