@@ -73,7 +73,9 @@ class AnnotationLoader
                 }
             }
 
-            if ($r->isSubclassOf('eBuildy\Container\ContainerAware'))
+            if ($r->isSubclassOf('eBuildy\Container\ContainerAware')
+                || in_array('eBuildy\Container\ContainerAwareTrait', $r->getTraitNames())
+                || $r->hasProperty('container'))
             {
                 $this->services[$this->currentService]['containerAware'] = true;
             }
